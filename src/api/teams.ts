@@ -5,6 +5,7 @@ export type TeamSummary = {
   id: string
   name: string
   ownerId: string
+  spaceId?: string | null
   role: 'OWNER' | 'ADMIN' | 'MEMBER'
   memberCount: number
   createdAt: string

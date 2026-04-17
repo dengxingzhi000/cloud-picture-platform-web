@@ -1,0 +1,504 @@
+.collab-canvas {
+  display: grid;
+  gap: 18px;
+}
+
+.collab-canvas--compact {
+  gap: 16px;
+}
+
+.collab-canvas__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.collab-canvas__header-copy {
+  max-width: 52rem;
+}
+
+.collab-canvas__eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #0f766e;
+}
+
+.collab-canvas__title {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.collab-canvas__subtitle {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+  max-width: 42rem;
+}
+
+.collab-canvas__status-cluster {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.collab-canvas__badge,
+.collab-canvas__mini-badge {
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.collab-canvas__badge.is-live {
+  background: rgba(15, 118, 110, 0.14);
+  color: #0f766e;
+}
+
+.collab-canvas__notice {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.collab-canvas__notice--warn {
+  background: rgba(252, 211, 77, 0.18);
+  border-color: rgba(217, 119, 6, 0.22);
+}
+
+.collab-canvas__notice button,
+.collab-canvas__tool-group button,
+.collab-canvas__focus-actions button,
+.collab-canvas__inspector-actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--ink-strong);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.collab-canvas__notice button:hover,
+.collab-canvas__tool-group button:hover,
+.collab-canvas__focus-actions button:hover,
+.collab-canvas__inspector-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.collab-canvas__notice button:disabled,
+.collab-canvas__tool-group button:disabled,
+.collab-canvas__focus-actions button:disabled,
+.collab-canvas__inspector-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.collab-canvas__toolbar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 22px;
+  border: 1px solid var(--stroke-soft);
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.08), transparent 24%),
+    rgba(255, 255, 255, 0.78);
+}
+
+.collab-canvas__toolbar-section {
+  display: grid;
+  gap: 8px;
+}
+
+.collab-canvas__toolbar-label {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-weight: 800;
+}
+
+.collab-canvas__tool-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.collab-canvas__tool-group button.is-active {
+  background: #0f766e;
+  color: #fff;
+}
+
+.collab-canvas__seed,
+.collab-canvas__textarea-field,
+.collab-canvas__field-grid label {
+  display: grid;
+  gap: 6px;
+}
+
+.collab-canvas__seed span,
+.collab-canvas__textarea-field span,
+.collab-canvas__field-grid span,
+.collab-canvas__metric-grid span {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-weight: 800;
+}
+
+.collab-canvas__seed input,
+.collab-canvas__field-grid input,
+.collab-canvas__textarea-field textarea {
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 12px;
+  color: var(--ink-strong);
+}
+
+.collab-canvas__textarea-field textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.collab-canvas__tool-hint {
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.collab-canvas__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
+  gap: 18px;
+}
+
+.collab-canvas__main,
+.collab-canvas__sidebar {
+  display: grid;
+  gap: 16px;
+}
+
+.collab-canvas__focus-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.collab-canvas__focus-card,
+.collab-canvas__card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid var(--stroke-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 245, 240, 0.94));
+}
+
+.collab-canvas__focus-card {
+  flex: 1;
+}
+
+.collab-canvas__focus-card span,
+.collab-canvas__person-copy span,
+.collab-canvas__activity-item span,
+.collab-canvas__empty,
+.collab-canvas__secondary-note {
+  color: var(--ink-soft);
+}
+
+.collab-canvas__focus-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.collab-canvas__focus-actions button:first-child,
+.collab-canvas__inspector-actions button:first-child {
+  background: #0f766e;
+  color: #fff;
+}
+
+.collab-canvas__stage-frame {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.16), transparent 32%),
+    linear-gradient(315deg, rgba(232, 93, 4, 0.18), transparent 34%),
+    #f3eee7;
+}
+
+.collab-canvas__stage-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.collab-canvas__stage-copy,
+.collab-canvas__stage-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.collab-canvas__stage-copy span,
+.collab-canvas__stage-meta span {
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+
+.collab-canvas__stage-meta {
+  justify-items: end;
+}
+
+.collab-canvas__stage-viewport {
+  overflow: auto;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(15, 23, 42, 0.08)),
+    rgba(15, 23, 42, 0.16);
+}
+
+.collab-canvas__stage-viewport--adaptive,
+.collab-canvas__stage-viewport--immersive {
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+}
+
+.collab-canvas__stage-viewport--native {
+  padding-bottom: 4px;
+}
+
+.collab-canvas__stage-viewport--native .collab-canvas__stage {
+  min-width: 100%;
+}
+
+.collab-canvas__loading {
+  position: absolute;
+  inset: 68px 18px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: var(--ink-soft);
+  backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+.collab-canvas__stage {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--canvas-aspect);
+  cursor: crosshair;
+}
+
+.collab-canvas__element {
+  cursor: pointer;
+}
+
+.collab-canvas__card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.collab-canvas__card-head span {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.collab-canvas__metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.collab-canvas__room-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.collab-canvas__room-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.collab-canvas__room-actions button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.08);
+  color: var(--ink-strong);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.collab-canvas__room-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.collab-canvas__metric-grid strong {
+  font-size: 1rem;
+}
+
+.collab-canvas__room-grid strong {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.collab-canvas__roster,
+.collab-canvas__activity {
+  display: grid;
+  gap: 10px;
+}
+
+.collab-canvas__person {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.collab-canvas__person:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.collab-canvas__avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 900;
+}
+
+.collab-canvas__person-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.collab-canvas__inspector {
+  display: grid;
+  gap: 12px;
+}
+
+.collab-canvas__field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.collab-canvas__secondary-note {
+  font-size: 0.88rem;
+}
+
+.collab-canvas__inspector-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.collab-canvas__inspector-actions button:last-child {
+  background: rgba(190, 24, 93, 0.12);
+  color: #9d174d;
+}
+
+.collab-canvas__activity-item {
+  display: grid;
+  gap: 4px;
+  padding-left: 14px;
+  border-left: 3px solid rgba(15, 23, 42, 0.08);
+}
+
+.collab-canvas__activity-item time {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.collab-canvas__activity-item.tone-accent {
+  border-left-color: rgba(15, 118, 110, 0.72);
+}
+
+.collab-canvas__activity-item.tone-warn {
+  border-left-color: rgba(217, 119, 6, 0.72);
+}
+
+@media (max-width: 1120px) {
+  .collab-canvas__toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .collab-canvas__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .collab-canvas__toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .collab-canvas__stage-frame,
+  .collab-canvas__stage-viewport--adaptive,
+  .collab-canvas__stage-viewport--immersive {
+    min-height: 340px;
+  }
+
+  .collab-canvas__metric-grid,
+  .collab-canvas__room-grid,
+  .collab-canvas__field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .collab-canvas__person {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .collab-canvas__mini-badge {
+    justify-self: start;
+  }
+
+  .collab-canvas__stage-meta {
+    justify-items: start;
+  }
+}

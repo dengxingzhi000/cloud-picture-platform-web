@@ -1,0 +1,25 @@
+.picture-edit-page {
+  display: grid;
+  gap: 18px;
+}
+
+.picture-edit-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.picture-edit-heading {
+  max-width: 54rem;
+}
+
+.editor-shell {
+  padding: 18px;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .editor-shell {
+    padding: 14px;
+  }
+}
