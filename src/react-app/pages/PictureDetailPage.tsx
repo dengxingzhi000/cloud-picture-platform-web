@@ -1,81 +1,367 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import PageShell from './common/PageShell'
-import CollabCanvas, { type CanvasElement } from '@/react-app/components/CollabCanvas'
-import { getPictureDetail, getPictureDocument, type PictureDetail } from '@/api/pictures'
+import { useNavigate, useParams } from 'react-router-dom'
+import {
+  addPictureTags,
+  getPictureDetail,
+  listPictureTags,
+  removePictureTag,
+  type PictureDetail,
+  type PictureTag,
+} from '@/api/pictures'
+import { listTags, type TagInfo } from '@/api/tags'
+import { useAuth } from '@/react-app/auth'
+import { Button } from '@/react-app/ui/shadcn/button'
 
-export default function PictureDetailPage() {
-  const params = useParams()
-  const pictureId = String(params.id || '')
+function statusColor(s: string) {
+  return { APPROVED: '#116350', REJECTED: '#9a3412', PENDING: '#8a5c00' }[s] ?? '#5a524c'
+}
 
-  const [detail, setDetail] = useState<PictureDetail | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [elements, setElements] = useState<CanvasElement[]>([])
+function statusBg(s: string) {
+  return {
+    APPROVED: 'rgba(31,138,112,0.14)',
+    REJECTED: 'rgba(154,52,18,0.12)',
+    PENDING: 'rgba(138,92,0,0.12)',
+  }[s] ?? 'rgba(90,82,76,0.1)'
+}
 
-  useEffect(() => {
-    let cancelled = false
-    async function run() {
-      setLoading(true)
-      try {
-        const [d, doc] = await Promise.all([getPictureDetail(pictureId), getPictureDocument(pictureId)])
-        if (cancelled) return
-        setDetail(d)
-        const nextElements: CanvasElement[] = (doc?.elements ?? []).map((e) => {
-          if (e.type === 'rect') {
-            return { id: e.id, type: 'rect', x: e.x, y: e.y, width: e.width, height: e.height }
-          }
-          return {
-            id: e.id,
-            type: 'text',
-            x: e.x,
-            y: e.y,
-            width: e.width,
-            height: e.height,
-            text: e.text ?? '',
-          }
-        })
-        setElements(nextElements)
-      } catch {
-        // Keep placeholder UI.
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }
-    if (pictureId) void run()
-    return () => {
-      cancelled = true
-    }
-  }, [pictureId])
-
+function Chip({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <PageShell title="Picture Detail">
-      {loading ? (
-        <div>Loading...</div>
-      ) : !detail ? (
-        <div>Picture not found.</div>
-      ) : (
-        <div style={{ display: 'grid', gap: 16 }}>
-          <div className="card-image" style={{ aspectRatio: '16/9' }}>
-            <img src={detail.url} alt={detail.name} />
-          </div>
-
-          <div className="grid" style={{ gap: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-              <div>
-                <strong>{detail.name}</strong>
-                <div style={{ color: 'var(--ink-soft)', marginTop: 6 }}>{detail.visibility}</div>
-              </div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <span className="tag">{detail.reviewStatus}</span>
-                {detail.canEdit ? <span className="tag" style={{ background: 'rgba(31, 138, 112, 0.14)' }}>Editable</span> : null}
-              </div>
-            </div>
-          </div>
-
-          <CollabCanvas pictureId={pictureId} pictureUrl={detail.url} initialElements={elements} />
-        </div>
-      )}
-    </PageShell>
+      <div style={{
+        display: 'grid', gap: 2,
+        padding: '10px 14px',
+        borderRadius: 14,
+        background: accent ? 'rgba(239,107,47,0.08)' : 'var(--bg-elevated)',
+        border: '1px solid var(--stroke-soft)',
+      }}>
+      <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)', fontWeight: 700 }}>
+        {label}
+      </span>
+        <span style={{ fontWeight: 700, fontSize: '0.92rem' }}>{value}</span>
+      </div>
   )
 }
 
+function formatBytes(b: number) {
+  if (b < 1024) return `${b} B`
+  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
+  return `${(b / 1024 / 1024).toFixed(2)} MB`
+}
+
+export default function PictureDetailPage() {
+  const { id: pictureId = '' } = useParams()
+  const navigate = useNavigate()
+  const { user } = useAuth()
+
+  const [detail, setDetail] = useState<PictureDetail | null>(null)
+  const [tags, setTags] = useState<PictureTag[]>([])
+  const [loading, setLoading] = useState(true)
+  const [imgLoaded, setImgLoaded] = useState(false)
+
+  // Tag management
+  const [tagInput, setTagInput] = useState('')
+  const [tagSuggestions, setTagSuggestions] = useState<TagInfo[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [addingTag, setAddingTag] = useState(false)
+
+  const canManageTags = detail?.canManage || detail?.canEdit
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const [d, t] = await Promise.all([getPictureDetail(pictureId), listPictureTags(pictureId)])
+      setDetail(d)
+      setTags(t)
+    } catch {
+      navigate(-1)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { void load() }, [pictureId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const trimmed = tagInput.trim()
+    if (!trimmed) { setTagSuggestions([]); setShowSuggestions(false); return }
+    const t = setTimeout(async () => {
+      try {
+        const res = await listTags({ page: 0, size: 6, keyword: trimmed })
+        setTagSuggestions(res.items)
+        setShowSuggestions(res.items.length > 0)
+      } catch { /* ignore */ }
+    }, 280)
+    return () => clearTimeout(t)
+  }, [tagInput])
+
+  const addTag = async (text: string) => {
+    const trimmed = text.trim()
+    if (!trimmed) return
+    setAddingTag(true)
+    setShowSuggestions(false)
+    try {
+      const next = await addPictureTags(pictureId, {
+        tags: [{ text: trimmed }],
+        provider: 'manual',
+        autoGenerated: false,
+      })
+      setTags(next)
+      setTagInput('')
+    } finally {
+      setAddingTag(false)
+    }
+  }
+
+  const removeTag = async (tagId: string) => {
+    try {
+      await removePictureTag(pictureId, tagId)
+      setTags((prev) => prev.filter((t) => t.id !== tagId))
+    } catch { /* ignore */ }
+  }
+
+  if (loading) {
+    return (
+        <div className="page">
+          <section className="panel" style={{ padding: 60, textAlign: 'center', color: 'var(--ink-soft)' }}>
+            Loading picture...
+          </section>
+        </div>
+    )
+  }
+
+  if (!detail) return null
+
+  return (
+      <div className="page">
+        {/* Back nav */}
+        <button
+            onClick={() => navigate(-1)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: 6, padding: 0 }}
+        >
+          ← Back
+        </button>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(280px, 0.9fr)', gap: 24, alignItems: 'start' }}>
+          {/* Left: image */}
+          <div>
+            <div style={{
+              borderRadius: 24,
+              overflow: 'hidden',
+              background: 'var(--bg-elevated)',
+              boxShadow: 'var(--shadow-soft)',
+              border: '1px solid var(--stroke-soft)',
+              position: 'relative',
+              minHeight: 320,
+            }}>
+              {!imgLoaded && (
+                  <div style={{
+                    position: 'absolute', inset: 0, display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    color: 'var(--ink-soft)', fontSize: '0.9rem',
+                  }}>
+                    Loading image...
+                  </div>
+              )}
+              <img
+                  src={detail.url}
+                  alt={detail.name}
+                  onLoad={() => setImgLoaded(true)}
+                  style={{ width: '100%', height: 'auto', display: imgLoaded ? 'block' : 'none', objectFit: 'contain' }}
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap' }}>
+              {detail.canEdit && (
+                  <Button variant="primary" onClick={() => navigate(`/pictures/${pictureId}/edit`)}>
+                    ✏️ {detail.canJoinCollaboration ? 'Open Collaboration Editor' : 'Edit Image'}
+                  </Button>
+              )}
+              <a
+                  href={detail.url}
+                  download={detail.name}
+                  style={{ textDecoration: 'none' }}
+              >
+                <Button variant="plain">⬇ Download</Button>
+              </a>
+            </div>
+          </div>
+
+          {/* Right: metadata */}
+          <div style={{ display: 'grid', gap: 16 }}>
+            {/* Header */}
+            <section className="panel">
+              <h2 style={{ margin: '0 0 6px', fontSize: '1.3rem', wordBreak: 'break-word' }}>{detail.name}</h2>
+              {detail.originalFilename && detail.originalFilename !== detail.name && (
+                  <div style={{ color: 'var(--ink-soft)', fontSize: '0.82rem', marginBottom: 12 }}>
+                    {detail.originalFilename}
+                  </div>
+              )}
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+              <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: '0.78rem', fontWeight: 700, background: statusBg(detail.reviewStatus), color: statusColor(detail.reviewStatus) }}>
+                {detail.reviewStatus}
+              </span>
+                <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: '0.78rem', fontWeight: 700, background: 'rgba(31,138,112,0.1)', color: '#116350' }}>
+                {detail.visibility}
+              </span>
+                {detail.canJoinCollaboration && (
+                    <span style={{ padding: '4px 12px', borderRadius: 999, fontSize: '0.78rem', fontWeight: 700, background: 'rgba(239,107,47,0.12)', color: '#b84e1f' }}>
+                  TEAM
+                </span>
+                )}
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                <Chip label="Size" value={formatBytes(detail.sizeBytes)} />
+                {detail.width && detail.height && (
+                    <Chip label="Dimensions" value={`${detail.width} × ${detail.height}`} />
+                )}
+                {detail.contentType && (
+                    <Chip label="Type" value={detail.contentType.split('/')[1]?.toUpperCase() ?? detail.contentType} />
+                )}
+                {detail.spaceType && (
+                    <Chip label="Space" value={detail.spaceType} accent />
+                )}
+              </div>
+            </section>
+
+            {/* Owner / Team */}
+            <section className="panel">
+              <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)', fontWeight: 700, marginBottom: 10 }}>
+                Owner
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: `hsl(${(detail.ownerUsername?.charCodeAt(0) ?? 65) * 47 % 360}, 55%, 65%)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontWeight: 800, fontSize: '0.9rem',
+                }}>
+                  {(detail.ownerDisplayName || detail.ownerUsername || '?').slice(0, 1).toUpperCase()}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{detail.ownerDisplayName || detail.ownerUsername}</div>
+                  {detail.spaceName && (
+                      <div style={{ fontSize: '0.78rem', color: 'var(--ink-soft)' }}>
+                        {detail.teamName ?? detail.spaceName}
+                      </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ marginTop: 10, fontSize: '0.8rem', color: 'var(--ink-soft)' }}>
+                <div>Created: {new Date(detail.createdAt).toLocaleString()}</div>
+                <div>Updated: {new Date(detail.updatedAt).toLocaleString()}</div>
+              </div>
+            </section>
+
+            {/* Tags */}
+            <section className="panel">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)', fontWeight: 700 }}>
+                  Tags ({tags.length})
+                </div>
+              </div>
+
+              {canManageTags && (
+                  <div style={{ position: 'relative', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                          value={tagInput}
+                          onChange={(e) => setTagInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') void addTag(tagInput)
+                            if (e.key === 'Escape') setShowSuggestions(false)
+                          }}
+                          onFocus={() => tagInput && setShowSuggestions(tagSuggestions.length > 0)}
+                          placeholder="Add a tag..."
+                          style={{
+                            flex: 1, padding: '7px 12px', borderRadius: 10,
+                            border: '1px solid var(--stroke-soft)', fontSize: '0.88rem',
+                            background: 'var(--bg-elevated)', outline: 'none',
+                          }}
+                      />
+                      <Button
+                          variant="primary"
+                          onClick={() => void addTag(tagInput)}
+                          disabled={addingTag || !tagInput.trim()}
+                          style={{ padding: '7px 14px', fontSize: '0.88rem' }}
+                      >
+                        {addingTag ? '...' : '+ Add'}
+                      </Button>
+                    </div>
+                    {showSuggestions && (
+                        <div style={{
+                          position: 'absolute', top: '100%', left: 0, right: 48,
+                          background: 'var(--bg-surface)', border: '1px solid var(--stroke-soft)',
+                          borderRadius: 10, marginTop: 4, zIndex: 20,
+                          boxShadow: '0 8px 24px rgba(30,20,10,0.1)',
+                        }}>
+                          {tagSuggestions.map((s) => (
+                              <button
+                                  key={s.id}
+                                  onMouseDown={() => void addTag(s.name)}
+                                  style={{
+                                    display: 'block', width: '100%', textAlign: 'left',
+                                    padding: '9px 14px', background: 'none', border: 'none',
+                                    cursor: 'pointer', fontSize: '0.88rem', color: 'var(--ink-strong)',
+                                    borderBottom: '1px solid var(--stroke-soft)',
+                                  }}
+                              >
+                                {s.name}
+                              </button>
+                          ))}
+                        </div>
+                    )}
+                  </div>
+              )}
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {tags.length === 0 && (
+                    <span style={{ color: 'var(--ink-soft)', fontSize: '0.85rem' }}>No tags yet.</span>
+                )}
+                {tags.map((tag) => (
+                    <span
+                        key={tag.id}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: 6,
+                          padding: '5px 12px',
+                          borderRadius: 999,
+                          background: tag.autoGenerated ? 'rgba(100,116,139,0.1)' : 'rgba(31,138,112,0.12)',
+                          color: tag.autoGenerated ? '#475569' : '#116350',
+                          fontSize: '0.8rem', fontWeight: 600,
+                        }}
+                    >
+                  {tag.tagText}
+                      {tag.confidenceScore != null && (
+                          <span style={{ opacity: 0.65, fontSize: '0.72rem' }}>
+                      {(tag.confidenceScore * 100).toFixed(0)}%
+                    </span>
+                      )}
+                      {canManageTags && (
+                          <button
+                              onClick={() => void removeTag(tag.id)}
+                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 2px', color: 'inherit', fontSize: '1rem', lineHeight: 1 }}
+                          >
+                            ×
+                          </button>
+                      )}
+                </span>
+                ))}
+              </div>
+            </section>
+
+            {/* Checksums for admins */}
+            {detail.checksum && user?.role === 'ADMIN' && (
+                <section className="panel soft">
+                  <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)', fontWeight: 700, marginBottom: 6 }}>
+                    Checksum
+                  </div>
+                  <code style={{ fontSize: '0.72rem', wordBreak: 'break-all', color: 'var(--ink-soft)' }}>
+                    {detail.checksum}
+                  </code>
+                </section>
+            )}
+          </div>
+        </div>
+      </div>
+  )
+}
