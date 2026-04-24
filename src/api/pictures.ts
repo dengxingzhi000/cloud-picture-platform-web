@@ -364,3 +364,22 @@ export async function exportReviews(params: {
   })
   return response.data as Blob
 }
+
+export type SearchReindexResponse = {
+  scope: string
+  queued: number
+  pictureId?: string | null
+  requestedAt: string
+}
+
+export async function reindexAllPictures() {
+  const response = await api.post<ApiResponse<SearchReindexResponse>>('/api/admin/search/reindex')
+  return unwrap(response.data)
+}
+
+export async function reindexSinglePicture(pictureId: string) {
+  const response = await api.post<ApiResponse<SearchReindexResponse>>(
+    `/api/admin/search/pictures/${pictureId}/reindex`
+  )
+  return unwrap(response.data)
+}

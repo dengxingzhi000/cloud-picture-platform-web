@@ -22,6 +22,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/react-app/ui/shadcn/input'
 import { Select } from '@/react-app/ui/shadcn/select'
 
+// Lazy-load the heavy editor page
 const PictureEditPage = lazy(() => import('@/react-app/pages/PictureEditPage'))
 
 function SettingsDialog({
