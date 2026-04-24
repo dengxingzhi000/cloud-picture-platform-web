@@ -13,28 +13,30 @@ export default function PictureEditPage() {
 
   const [detail, setDetail] = useState<PictureDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
 
     async function run() {
       setLoading(true)
+      setError(null)
       try {
         const data = await getPictureDetail(pictureId)
         if (cancelled) return
         setDetail(data)
       } catch {
-        if (!cancelled) setDetail(null)
+        if (!cancelled) {
+          setError('Failed to load picture details. You may not have access.')
+          setDetail(null)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
 
     if (pictureId) void run()
-
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [pictureId])
 
   const usesTeamWorkspace = detail?.spaceType === 'TEAM' && detail.canJoinCollaboration
@@ -45,32 +47,54 @@ export default function PictureEditPage() {
         <div className="picture-edit-heading">
           <h1 className="page-title">{detail?.name ?? 'Edit Picture'}</h1>
           <p className="page-subtitle">
-            {usesTeamWorkspace
-              ? 'Team workspace with live presence, shared annotations, and synchronized updates.'
+            {loading
+              ? 'Loading…'
+              : usesTeamWorkspace
+              ? 'Team workspace — live presence, shared annotations, and synchronized document updates.'
               : 'Professional image editor for standalone public and personal assets.'}
           </p>
         </div>
         <div className="picture-edit-actions">
           <Button variant="plain" onClick={() => navigate(`/pictures/${pictureId}`)}>
-            Back to detail
+            ← Back to detail
           </Button>
         </div>
       </div>
 
       {loading ? (
         <section className="panel">
-          <div className="ui-skeleton" aria-label="loading">
+          <div style={{ display: 'grid', gap: 12 }}>
             {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="ui-skeleton-line" />
+              <div
+                key={index}
+                style={{
+                  height: 18,
+                  borderRadius: 9,
+                  background: 'linear-gradient(90deg, #efe7dd 25%, #f5f0ea 50%, #efe7dd 75%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'shimmer 1.4s infinite',
+                  width: `${70 - index * 12}%`,
+                }}
+              />
             ))}
           </div>
+          <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
+        </section>
+      ) : error ? (
+        <section className="panel soft" style={{ textAlign: 'center', padding: 48 }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>⚠️</div>
+          <div style={{ fontWeight: 700, marginBottom: 8 }}>Access Error</div>
+          <p style={{ color: 'var(--ink-soft)', margin: '0 0 20px' }}>{error}</p>
+          <Button variant="plain" onClick={() => navigate(-1)}>Go back</Button>
         </section>
       ) : !detail ? (
-        <section className="panel soft">
-          <div className="section-title">Picture not found</div>
-          <p className="empty-copy">No editable picture detail was returned for this record.</p>
+        <section className="panel soft" style={{ textAlign: 'center', padding: 48 }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🖼️</div>
+          <div style={{ fontWeight: 700 }}>Picture not found</div>
+          <p style={{ color: 'var(--ink-soft)' }}>No editable picture detail was returned for this record.</p>
         </section>
       ) : usesTeamWorkspace ? (
+        /* Team collaboration canvas */
         <section className="panel editor-shell">
           <CollabCanvas
             pictureId={pictureId}
@@ -78,6 +102,7 @@ export default function PictureEditPage() {
           />
         </section>
       ) : detail.canEdit ? (
+        /* Standard filerobot editor for personal/public assets */
         <section className="panel editor-shell">
           <StandardPictureEditor
             pictureUrl={detail.url}
@@ -87,9 +112,15 @@ export default function PictureEditPage() {
           />
         </section>
       ) : (
-        <section className="panel soft">
-          <div className="section-title">Editor unavailable</div>
-          <p className="empty-copy">The current account does not have permission to open this editing interface.</p>
+        <section className="panel soft" style={{ textAlign: 'center', padding: 48 }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🔒</div>
+          <div style={{ fontWeight: 700 }}>Editor unavailable</div>
+          <p style={{ color: 'var(--ink-soft)' }}>
+            The current account does not have permission to edit this picture.
+          </p>
+          <Button variant="plain" onClick={() => navigate(`/pictures/${pictureId}`)}>
+            View detail
+          </Button>
         </section>
       )}
     </div>

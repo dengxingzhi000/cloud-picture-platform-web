@@ -177,6 +177,28 @@ export async function listMemberEvents(
   return unwrap(response.data)
 }
 
+export async function listInviteCancelEvents(
+  teamId: string,
+  params: {
+    page?: number
+    size?: number
+    userId?: string
+    actorId?: string
+    createdAfter?: string
+    createdBefore?: string
+    sortBy?: string
+    sortDir?: string
+  }
+) {
+  const response = await api.get<ApiResponse<PageResponse<TeamMemberEvent>>>(
+    `/api/teams/${teamId}/invites/cancellations`,
+    {
+      params,
+    }
+  )
+  return unwrap(response.data)
+}
+
 export async function exportMemberEvents(
   teamId: string,
   params: {
