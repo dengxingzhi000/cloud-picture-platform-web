@@ -4,6 +4,9 @@ import { BrowserRouter, NavLink, Navigate, Outlet, Route, Routes, useLocation, u
 import { AuthProvider, useAuth } from '@/react-app/auth'
 import { updateProfile } from '@/api/auth'
 import { ThemeProvider, useTheme } from '@/react-app/theme'
+import { ToastProvider } from '@/react-app/toast'
+import { NotificationProvider } from '@/react-app/pages/notifications'
+import NotificationBell from '@/react-app/pages/NotificationBell'
 import {
   AdminReviewDetailPage,
   AdminReviewListPage,
@@ -20,10 +23,15 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/react-app/ui/shadcn/dialog'
 import { Input } from '@/react-app/ui/shadcn/input'
-import { Select } from '@/react-app/ui/shadcn/select'
+import { SelectCustom } from '@/react-app/ui/shadcn/select-custom'
 
-// Lazy-load the heavy editor page
+import { ErrorBoundary } from '@/react-app/ui/ErrorBoundary'
+
+// Lazy-load heavy pages
 const PictureEditPage = lazy(() => import('@/react-app/pages/PictureEditPage'))
+const AdminLayout = lazy(() => import('@/react-app/pages/admin/AdminLayout'))
+const AdminDashboardPage = lazy(() => import('@/react-app/pages/admin/AdminDashboardPage'))
+const AdminSearchPage = lazy(() => import('@/react-app/pages/AdminSearchPage'))
 
 function SettingsDialog({
   open,
@@ -104,24 +112,26 @@ function SettingsDialog({
           <div className="settings-grid">
             <label className="field">
               <span className="label">{t('app.language')}</span>
-              <Select
+              <SelectCustom
                 value={i18n.language}
-                onChange={(event) => void i18n.changeLanguage(event.target.value)}
-              >
-                <option value="zh-CN">中文</option>
-                <option value="en">English</option>
-              </Select>
+                onChange={(value) => void i18n.changeLanguage(value)}
+                options={[
+                  { value: 'zh-CN', label: '中文' },
+                  { value: 'en', label: 'English' },
+                ]}
+              />
             </label>
             <label className="field">
               <span className="label">{t('app.appearance')}</span>
-              <Select
+              <SelectCustom
                 value={theme}
-                onChange={(event) => setTheme(event.target.value as 'light' | 'dark' | 'system')}
-              >
-                <option value="light">{t('app.themeLight')}</option>
-                <option value="dark">{t('app.themeDark')}</option>
-                <option value="system">{t('app.themeSystem')}</option>
-              </Select>
+                onChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}
+                options={[
+                  { value: 'light', label: t('app.themeLight') },
+                  { value: 'dark', label: t('app.themeDark') },
+                  { value: 'system', label: t('app.themeSystem') },
+                ]}
+              />
             </label>
           </div>
           {error ? <div className="form-error">{error}</div> : null}
@@ -153,11 +163,10 @@ function ShellLayout() {
     { label: t('nav.upload'), path: '/upload', auth: true },
     { label: t('nav.teams'), path: '/teams', auth: true },
     { label: t('nav.tags'), path: '/tags', auth: true },
-    { label: t('nav.adminReview'), path: '/admin/reviews', auth: true, admin: true },
   ]
 
   const visibleNavItems = navItems.filter(
-    (item) => (!item.auth || isAuthed) && (!item.admin || isAdmin)
+    (item) => !item.auth || isAuthed
   )
 
   return (
@@ -195,6 +204,12 @@ function ShellLayout() {
           </button>
           {isAuthed ? (
             <>
+              <NotificationBell />
+              {isAdmin && (
+                <Button variant="plain" onClick={() => navigate('/admin')} style={{ fontSize: '0.82rem' }}>
+                  ⬢ Admin
+                </Button>
+              )}
               <button type="button" className="user-pill user-card" onClick={() => setProfileOpen(true)}>
                 {user?.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user?.displayName || user?.username || 'User'} className="profile-avatar" />
@@ -278,9 +293,16 @@ function AppRoutes() {
             <Route path="/pictures/:id" element={<PictureDetailPage />} />
             <Route path="/pictures/:id/edit" element={<PictureEditPage />} />
             <Route path="/tags" element={<TagsPage />} />
-            <Route element={<RequireAdmin />}>
-              <Route path="/admin/reviews" element={<AdminReviewListPage />} />
-              <Route path="/admin/reviews/:id" element={<AdminReviewDetailPage />} />
+          </Route>
+        </Route>
+        {/* Admin portal — separate layout */}
+        <Route element={<RequireAuth />}>
+          <Route element={<RequireAdmin />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="reviews" element={<AdminReviewListPage />} />
+              <Route path="reviews/:id" element={<AdminReviewDetailPage />} />
+              <Route path="search-index" element={<AdminSearchPage />} />
             </Route>
           </Route>
         </Route>
@@ -293,11 +315,17 @@ function AppRoutes() {
 export function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <BrowserRouter>
+              <ErrorBoundary>
+                <AppRoutes />
+              </ErrorBoundary>
+            </BrowserRouter>
+          </NotificationProvider>
+        </AuthProvider>
+      </ToastProvider>
     </ThemeProvider>
   )
 }

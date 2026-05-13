@@ -78,7 +78,6 @@ export default function PictureEditPage() {
               />
             ))}
           </div>
-          <style>{`@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
         </section>
       ) : error ? (
         <section className="panel soft" style={{ textAlign: 'center', padding: 48 }}>

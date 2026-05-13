@@ -2,11 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { listPublic, listRecommendations, type PictureSummary } from '@/api/pictures'
 import { useAuth } from '@/react-app/auth'
-
-function formatBytes(b: number) {
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KB`
-  return `${(b / 1024 / 1024).toFixed(1)} MB`
-}
+import { TiltedCard, LazyWrapper } from '@/react-app/components'
+import { formatBytes } from '@/utils/format'
 
 type OrientationFilter = 'all' | 'LANDSCAPE' | 'PORTRAIT' | 'SQUARE'
 
@@ -52,10 +49,14 @@ export default function GalleryPage() {
           maxSizeBytes,
         })
       }
+      
+      // 前端安全过滤：公共画廊只显示 PUBLIC 可见性的图片
+      const filteredItems = res.items.filter(item => item.visibility === 'PUBLIC')
+      
       if (append) {
-        setItems((prev) => [...prev, ...res.items])
+        setItems((prev) => [...prev, ...filteredItems])
       } else {
-        setItems(res.items)
+        setItems(filteredItems)
       }
       setTotal(res.total)
       setPage(pageIndex)
@@ -129,6 +130,7 @@ export default function GalleryPage() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             placeholder="🔍 Search by name..."
+            aria-label="Search pictures by name"
             style={{
               flex: '1 1 200px',
               padding: '9px 14px',
@@ -168,6 +170,7 @@ export default function GalleryPage() {
           <select
             value={orientation}
             onChange={(e) => setOrientation(e.target.value as OrientationFilter)}
+            aria-label="Filter by orientation"
             style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid var(--stroke-soft)', fontSize: '0.88rem', cursor: 'pointer' }}
           >
             <option value="all">All orientations</option>
@@ -180,6 +183,7 @@ export default function GalleryPage() {
           <select
             value={sizeBucket}
             onChange={(e) => setSizeBucket(e.target.value as typeof sizeBucket)}
+            aria-label="Filter by file size"
             style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid var(--stroke-soft)', fontSize: '0.88rem', cursor: 'pointer' }}
           >
             <option value="all">All sizes</option>
@@ -215,35 +219,40 @@ export default function GalleryPage() {
         <>
           <div className="grid cols-3">
             {items.map((p, i) => (
-              <div
-                key={p.id + '-' + i}
+              <button
+                key={p.id}
                 className="card"
-                style={{ cursor: 'pointer', '--delay': `${(i % 9) * 50}ms` } as React.CSSProperties}
+                style={{ cursor: 'pointer', '--delay': `${(i % 9) * 50}ms`, textAlign: 'left', width: '100%' } as React.CSSProperties}
                 onClick={() => navigate(`/pictures/${p.id}`)}
               >
-                <div className="card-image">
-                  <img
-                    src={p.url}
-                    alt={p.name}
-                    loading="lazy"
-                    style={{ transition: 'transform 0.3s ease' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                <LazyWrapper>
+                  <TiltedCard
+                    imageSrc={p.url}
+                    altText={p.name}
+                    captionText={p.name}
+                    containerHeight="240px"
+                    containerWidth="100%"
+                    imageHeight="240px"
+                    imageWidth="100%"
+                    rotateAmplitude={8}
+                    scaleOnHover={1.05}
+                    showMobileWarning={false}
+                    showTooltip={true}
                   />
-                </div>
-                <div>
+                </LazyWrapper>
+                <div style={{ padding: '12px 0 0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
-                    <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.9rem' }}>
+                    <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.88rem' }}>
                       {p.name}
                     </strong>
-                    <span className="tag">{p.visibility}</span>
+                    <span className="tag" style={{ flexShrink: 0 }}>{p.visibility}</span>
                   </div>
-                  <div style={{ display: 'flex', gap: 12, marginTop: 6, color: 'var(--ink-soft)', fontSize: '0.78rem' }}>
-                    <span>{formatBytes(p.sizeBytes)}</span>
-                    {p.width && p.height && <span>{p.width}×{p.height}</span>}
+                  <div style={{ marginTop: 4, color: 'var(--ink-soft)', fontSize: '0.75rem' }}>
+                    {formatBytes(p.sizeBytes)}
+                    {p.width && p.height && ` · ${p.width}×${p.height}`}
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
 
@@ -261,13 +270,6 @@ export default function GalleryPage() {
           )}
         </>
       )}
-
-      <style>{`
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
     </div>
   )
 }

@@ -2,11 +2,14 @@ import { type FormEvent, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { login, register } from '@/api/auth'
 import { useAuth } from '@/react-app/auth'
+import { TextPressure } from '@/react-app/components'
+import { useTranslation } from 'react-i18next'
 
 type Mode = 'login' | 'register'
 
 export default function LoginPage() {
   const { applyAuth, refresh } = useAuth()
+  const { t } = useTranslation()
   const nav = useNavigate()
   const location = useLocation()
 
@@ -34,7 +37,7 @@ export default function LoginPage() {
       await refresh()
       nav(redirect)
     } catch {
-      setError('Invalid credentials. Please check your username/email and password.')
+      setError(t('login.requestFailed'))
     } finally {
       setSubmitting(false)
     }
@@ -64,7 +67,7 @@ export default function LoginPage() {
       nav(redirect)
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-      setError(msg || 'Registration failed. The username or email may already be taken.')
+      setError(msg || t('login.requestFailed'))
     } finally {
       setSubmitting(false)
     }
@@ -88,17 +91,32 @@ export default function LoginPage() {
             background: 'conic-gradient(from 220deg, #ef6b2f, #f5b83d, #1f8a70, #ef6b2f)',
             boxShadow: '0 12px 30px rgba(239,107,47,0.25)',
           }} />
-          <h1 style={{ margin: '0 0 6px', fontSize: '1.8rem', fontWeight: 900 }}>Cloud Canvas</h1>
+          <div style={{ position: 'relative', height: '60px', marginBottom: 6 }}>
+            <TextPressure
+              text="Cloud Canvas"
+              flex={true}
+              alpha={false}
+              stroke={false}
+              width={true}
+              weight={true}
+              italic={true}
+              textColor="var(--ink-strong)"
+              strokeColor="var(--accent)"
+              minFontSize={36}
+            />
+          </div>
           <p style={{ margin: 0, color: 'var(--ink-soft)', fontSize: '0.95rem' }}>
             {mode === 'login' ? 'Sign in to your workspace' : 'Create a new account'}
           </p>
         </div>
 
         {/* Mode tabs */}
-        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderRadius: 14, background: 'rgba(32,26,22,0.07)', padding: 4 }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderRadius: 14, background: 'rgba(32,26,22,0.07)', padding: 4 }} role="tablist">
           {(['login', 'register'] as Mode[]).map((m) => (
             <button
               key={m}
+              role="tab"
+              aria-selected={mode === m}
               onClick={() => { setMode(m); setError(null) }}
               style={{
                 flex: 1, padding: '9px 0', borderRadius: 11, border: 'none',

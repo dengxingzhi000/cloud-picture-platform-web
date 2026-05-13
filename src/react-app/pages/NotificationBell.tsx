@@ -207,13 +207,6 @@ export default function NotificationBell() {
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes dropdownIn {
-          from { opacity: 0; transform: translateY(-8px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
     </div>
   )
 }

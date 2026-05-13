@@ -3,19 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { exportReviews, listPending, type AdminPictureSummary } from '@/api/pictures'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Input } from '@/react-app/ui/shadcn/input'
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
-}
+import { formatBytes } from '@/utils/format'
+import { useToast } from '@/react-app/toast'
 
 type StatusFilter = '' | 'PENDING' | 'APPROVED' | 'REJECTED'
 
 export default function AdminReviewListPage() {
   const navigate = useNavigate()
+  const { addToast } = useToast()
   const [items, setItems] = useState<AdminPictureSummary[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -38,8 +33,8 @@ export default function AdminReviewListPage() {
       const data = await listPending(page - 1, size)
       setItems(data.items)
       setTotal(data.total)
-    } catch (error) {
-      console.error('Failed to load pending list', error)
+    } catch {
+      addToast('Failed to load pending list', 'error')
     } finally {
       setLoading(false)
     }
@@ -74,8 +69,8 @@ export default function AdminReviewListPage() {
       link.download = `moderation_reviews_${new Date().toISOString().slice(0, 10)}.csv`
       link.click()
       URL.revokeObjectURL(url)
-    } catch (error) {
-      console.error('Export failed', error)
+    } catch {
+      addToast('Export failed. Please try again.', 'error')
     } finally {
       setExportLoading(false)
     }

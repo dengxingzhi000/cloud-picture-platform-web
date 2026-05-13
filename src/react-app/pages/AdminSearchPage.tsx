@@ -1,15 +1,7 @@
 import { useState } from 'react'
-import api, { unwrap } from '@/api/client'
-import type { ApiResponse } from '@/api/client'
+import { reindexAllPictures, reindexSinglePicture } from '@/api/pictures'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Input } from '@/react-app/ui/shadcn/input'
-
-type ReindexResponse = {
-  scope: string
-  queued: number
-  pictureId?: string | null
-  requestedAt: string
-}
 
 type LogEntry = {
   id: string
@@ -19,18 +11,6 @@ type LogEntry = {
   pictureId?: string | null
   status: 'success' | 'error'
   message?: string
-}
-
-async function reindexAll(): Promise<ReindexResponse> {
-  const res = await api.post<ApiResponse<ReindexResponse>>('/api/admin/search/reindex')
-  return unwrap(res.data)
-}
-
-async function reindexOne(pictureId: string): Promise<ReindexResponse> {
-  const res = await api.post<ApiResponse<ReindexResponse>>(
-    `/api/admin/search/pictures/${pictureId}/reindex`
-  )
-  return unwrap(res.data)
 }
 
 export default function AdminSearchPage() {
@@ -53,7 +33,7 @@ export default function AdminSearchPage() {
   const handleReindexAll = async () => {
     setLoadingAll(true)
     try {
-      const result = await reindexAll()
+      const result = await reindexAllPictures()
       appendLog({
         scope: 'all',
         queued: result.queued,
@@ -77,7 +57,7 @@ export default function AdminSearchPage() {
     if (!id) return
     setLoadingOne(true)
     try {
-      const result = await reindexOne(id)
+      const result = await reindexSinglePicture(id)
       appendLog({
         scope: 'picture',
         queued: result.queued,
@@ -269,8 +249,6 @@ export default function AdminSearchPage() {
           </div>
         </section>
       )}
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }
