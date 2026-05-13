@@ -3,15 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { searchPictures, type PictureSummary } from '@/api/pictures'
 import { listTags, type TagInfo } from '@/api/tags'
 import { Button } from '@/react-app/ui/shadcn/button'
+import { SelectCustom } from '@/react-app/ui/shadcn/select-custom'
+import { TiltedCard, LazyWrapper } from '@/react-app/components'
+import { formatBytes } from '@/utils/format'
 
 type ReviewStatus = 'PENDING' | 'APPROVED' | 'REJECTED'
 type Visibility = 'PUBLIC' | 'PRIVATE' | 'TEAM'
 type Orientation = 'LANDSCAPE' | 'PORTRAIT' | 'SQUARE'
-
-function formatBytes(b: number) {
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KB`
-  return `${(b / 1024 / 1024).toFixed(1)} MB`
-}
 
 export default function SearchPage() {
   const navigate = useNavigate()
@@ -110,6 +108,13 @@ export default function SearchPage() {
     return () => clearTimeout(t)
   }, [tag])
 
+  // 页面加载时自动执行一次搜索
+  useEffect(() => {
+    if (!hasSearched) {
+      void doSearch(0, false)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Infinite scroll
   useEffect(() => {
     const el = sentinelRef.current
@@ -133,8 +138,6 @@ export default function SearchPage() {
     background: 'var(--bg-elevated)', outline: 'none',
   }
 
-  const selectStyle: React.CSSProperties = { ...inputStyle, cursor: 'pointer' }
-
   return (
     <div className="page">
       <div className="page-header">
@@ -157,6 +160,7 @@ export default function SearchPage() {
                 onChange={(e) => setKeyword(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && void handleSearch()}
                 placeholder="Name, filename, or tag…"
+                aria-label="Search keyword"
               />
             </label>
             <label className="field" style={{ position: 'relative' }}>
@@ -167,6 +171,7 @@ export default function SearchPage() {
                 onChange={(e) => { setTag(e.target.value); setTagId('') }}
                 onKeyDown={(e) => e.key === 'Escape' && setShowSuggestions(false)}
                 placeholder="Tag name…"
+                aria-label="Filter by tag name"
               />
               {showSuggestions && (
                 <div style={{
@@ -194,11 +199,11 @@ export default function SearchPage() {
             </label>
             <label className="field">
               <span className="label">Owner ID</span>
-              <input style={inputStyle} value={ownerId} onChange={(e) => setOwnerId(e.target.value)} placeholder="UUID" />
+              <input style={inputStyle} value={ownerId} onChange={(e) => setOwnerId(e.target.value)} placeholder="UUID" aria-label="Filter by owner ID" />
             </label>
             <label className="field">
               <span className="label">Space ID</span>
-              <input style={inputStyle} value={spaceId} onChange={(e) => setSpaceId(e.target.value)} placeholder="UUID" />
+              <input style={inputStyle} value={spaceId} onChange={(e) => setSpaceId(e.target.value)} placeholder="UUID" aria-label="Filter by space ID" />
             </label>
           </div>
 
@@ -206,30 +211,42 @@ export default function SearchPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
             <label className="field">
               <span className="label">Visibility</span>
-              <select style={selectStyle} value={visibility} onChange={(e) => setVisibility(e.target.value as Visibility | '')}>
-                <option value="">All</option>
-                <option value="PUBLIC">Public</option>
-                <option value="PRIVATE">Private</option>
-                <option value="TEAM">Team</option>
-              </select>
+              <SelectCustom
+                value={visibility}
+                onChange={(value) => setVisibility(value as Visibility | '')}
+                options={[
+                  { value: '', label: 'All' },
+                  { value: 'PUBLIC', label: 'Public' },
+                  { value: 'PRIVATE', label: 'Private' },
+                  { value: 'TEAM', label: 'Team' },
+                ]}
+              />
             </label>
             <label className="field">
               <span className="label">Review status</span>
-              <select style={selectStyle} value={reviewStatus} onChange={(e) => setReviewStatus(e.target.value as ReviewStatus | '')}>
-                <option value="">All</option>
-                <option value="PENDING">Pending</option>
-                <option value="APPROVED">Approved</option>
-                <option value="REJECTED">Rejected</option>
-              </select>
+              <SelectCustom
+                value={reviewStatus}
+                onChange={(value) => setReviewStatus(value as ReviewStatus | '')}
+                options={[
+                  { value: '', label: 'All' },
+                  { value: 'PENDING', label: 'Pending' },
+                  { value: 'APPROVED', label: 'Approved' },
+                  { value: 'REJECTED', label: 'Rejected' },
+                ]}
+              />
             </label>
             <label className="field">
               <span className="label">Orientation</span>
-              <select style={selectStyle} value={orientation} onChange={(e) => setOrientation(e.target.value as Orientation | '')}>
-                <option value="">All</option>
-                <option value="LANDSCAPE">Landscape</option>
-                <option value="PORTRAIT">Portrait</option>
-                <option value="SQUARE">Square</option>
-              </select>
+              <SelectCustom
+                value={orientation}
+                onChange={(value) => setOrientation(value as Orientation | '')}
+                options={[
+                  { value: '', label: 'All' },
+                  { value: 'LANDSCAPE', label: 'Landscape' },
+                  { value: 'PORTRAIT', label: 'Portrait' },
+                  { value: 'SQUARE', label: 'Square' },
+                ]}
+              />
             </label>
             <label className="field">
               <span className="label">Min size (MB)</span>
@@ -241,30 +258,30 @@ export default function SearchPage() {
             </label>
           </div>
 
-          {/* Row 3: dates + sort */}
+          {/* Row 3: sort */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
             <label className="field">
-              <span className="label">Created after</span>
-              <input style={inputStyle} type="date" value={createdAfter} onChange={(e) => setCreatedAfter(e.target.value)} />
-            </label>
-            <label className="field">
-              <span className="label">Created before</span>
-              <input style={inputStyle} type="date" value={createdBefore} onChange={(e) => setCreatedBefore(e.target.value)} />
-            </label>
-            <label className="field">
               <span className="label">Sort by</span>
-              <select style={selectStyle} value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}>
-                <option value="createdAt">Created at</option>
-                <option value="updatedAt">Updated at</option>
-                <option value="sizeBytes">File size</option>
-              </select>
+              <SelectCustom
+                value={sortBy}
+                onChange={(value) => setSortBy(value as typeof sortBy)}
+                options={[
+                  { value: 'createdAt', label: 'Created date' },
+                  { value: 'updatedAt', label: 'Updated date' },
+                  { value: 'sizeBytes', label: 'File size' },
+                ]}
+              />
             </label>
             <label className="field">
               <span className="label">Direction</span>
-              <select style={selectStyle} value={sortDir} onChange={(e) => setSortDir(e.target.value as 'asc' | 'desc')}>
-                <option value="desc">Newest first</option>
-                <option value="asc">Oldest first</option>
-              </select>
+              <SelectCustom
+                value={sortDir}
+                onChange={(value) => setSortDir(value as 'asc' | 'desc')}
+                options={[
+                  { value: 'asc', label: 'Ascending' },
+                  { value: 'desc', label: 'Descending' },
+                ]}
+              />
             </label>
           </div>
 
@@ -293,16 +310,28 @@ export default function SearchPage() {
             <>
               <div className="grid cols-3">
                 {items.map((p, i) => (
-                  <div
-                    key={p.id + '-' + i}
+                  <button
+                    key={p.id}
                     className="card"
-                    style={{ cursor: 'pointer', '--delay': `${(i % 9) * 50}ms` } as React.CSSProperties}
+                    style={{ cursor: 'pointer', '--delay': `${(i % 9) * 50}ms`, textAlign: 'left', width: '100%' } as React.CSSProperties}
                     onClick={() => navigate(`/pictures/${p.id}`)}
                   >
-                    <div className="card-image">
-                      <img src={p.url} alt={p.name} loading="lazy" />
-                    </div>
-                    <div>
+                    <LazyWrapper>
+                      <TiltedCard
+                        imageSrc={p.url}
+                        altText={p.name}
+                        captionText={p.name}
+                        containerHeight="240px"
+                        containerWidth="100%"
+                        imageHeight="240px"
+                        imageWidth="100%"
+                        rotateAmplitude={8}
+                        scaleOnHover={1.05}
+                        showMobileWarning={false}
+                        showTooltip={true}
+                      />
+                    </LazyWrapper>
+                    <div style={{ padding: '12px 0 0' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
                         <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.88rem' }}>
                           {p.name}
@@ -314,7 +343,7 @@ export default function SearchPage() {
                         {p.width && p.height && ` · ${p.width}×${p.height}`}
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   cancelInvite,
+  exportMemberEvents,
   getTeamDetail,
   inviteMember,
   listMemberEvents,
@@ -79,6 +80,10 @@ export default function TeamDetailPage() {
 
   // Action loading
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [exportingEvents, setExportingEvents] = useState(false)
+
+  // Remove member confirmation
+  const [removeTargetId, setRemoveTargetId] = useState<string | null>(null)
 
   const myMember = members.find((m) => m.userId === user?.userId)
   const isOwner = myMember?.role === 'OWNER'
@@ -124,13 +129,18 @@ export default function TeamDetailPage() {
   }
 
   const handleRemove = async (userId: string) => {
-    if (!confirm('Remove this member?')) return
-    setActionLoading('remove-' + userId)
+    setRemoveTargetId(userId)
+  }
+
+  const confirmRemove = async () => {
+    if (!removeTargetId) return
+    setActionLoading('remove-' + removeTargetId)
     try {
-      await removeMember(teamId, userId)
+      await removeMember(teamId, removeTargetId)
       await loadAll()
     } finally {
       setActionLoading(null)
+      setRemoveTargetId(null)
     }
   }
 
@@ -163,6 +173,27 @@ export default function TeamDetailPage() {
       await loadAll()
     } finally {
       setEditSaving(false)
+    }
+  }
+
+  const handleExportEvents = async () => {
+    setExportingEvents(true)
+    try {
+      const blob = await exportMemberEvents(teamId, {
+        sortBy: 'createdAt',
+        sortDir: 'desc',
+        limit: 5000,
+      })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `team_events_${detail?.name ?? teamId}_${new Date().toISOString().slice(0, 10)}.csv`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      /* ignore */
+    } finally {
+      setExportingEvents(false)
     }
   }
 
@@ -379,6 +410,18 @@ export default function TeamDetailPage() {
       {/* Events Tab */}
       {tab === 'events' && (
         <section className="panel">
+          {isAdmin && events.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+              <Button
+                variant="plain"
+                onClick={() => void handleExportEvents()}
+                disabled={exportingEvents}
+                style={{ fontSize: '0.82rem', padding: '6px 14px' }}
+              >
+                {exportingEvents ? 'Exporting…' : '⬇ Export CSV'}
+              </Button>
+            </div>
+          )}
           {events.length === 0 ? (
             <div style={{ padding: 32, textAlign: 'center', color: 'var(--ink-soft)' }}>No activity yet.</div>
           ) : (
@@ -503,6 +546,30 @@ export default function TeamDetailPage() {
             <Button variant="plain" onClick={() => setEditOpen(false)} disabled={editSaving}>Cancel</Button>
             <Button variant="primary" onClick={() => void handleEditTeam()} disabled={editSaving || !editName.trim()}>
               {editSaving ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Member Confirmation Dialog */}
+      <Dialog open={removeTargetId !== null} onOpenChange={(open) => { if (!open) setRemoveTargetId(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Remove member?</DialogTitle>
+          </DialogHeader>
+          <p style={{ margin: '16px 0', color: 'var(--ink-soft)' }}>
+            This member will be removed from the team. This action cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button variant="plain" onClick={() => setRemoveTargetId(null)} disabled={actionLoading !== null}>
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => void confirmRemove()}
+              disabled={actionLoading !== null}
+            >
+              {actionLoading ? 'Removing…' : 'Remove'}
             </Button>
           </DialogFooter>
         </DialogContent>

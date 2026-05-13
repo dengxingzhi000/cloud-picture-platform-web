@@ -144,10 +144,10 @@ export default function TeamsPage() {
         ) : (
           <div className="grid cols-3">
             {teams.map((team, i) => (
-              <div
+              <button
                 key={team.id}
                 className="card"
-                style={{ cursor: 'pointer', '--delay': `${i * 60}ms` } as React.CSSProperties}
+                style={{ cursor: 'pointer', '--delay': `${i * 60}ms`, textAlign: 'left', width: '100%' } as React.CSSProperties}
                 onClick={() => navigate(`/teams/${team.id}`)}
               >
                 <div
@@ -175,7 +175,7 @@ export default function TeamsPage() {
                     <span>📅 {new Date(team.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )

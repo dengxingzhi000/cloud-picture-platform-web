@@ -8,6 +8,7 @@ import {
 } from '@/api/pictures'
 import { listTeams, type TeamSummary } from '@/api/teams'
 import { Button } from '@/react-app/ui/shadcn/button'
+import { formatBytes } from '@/utils/format'
 
 type VisibilityOption = 'PUBLIC' | 'PRIVATE' | 'TEAM'
 
@@ -17,11 +18,6 @@ async function sha256Hex(file: File): Promise<string> {
   return Array.from(new Uint8Array(hash))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
-}
-
-function formatBytes(b: number) {
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KB`
-  return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
 
 export default function UploadPage() {
@@ -176,7 +172,7 @@ export default function UploadPage() {
           </div>
         </section>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 20, alignItems: 'start' }}>
+        <div className="responsive-two-col" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 20, alignItems: 'start' }}>
           {/* Drop zone */}
           <div>
             <div
@@ -230,7 +226,7 @@ export default function UploadPage() {
                 </div>
               )}
             </div>
-            <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+            <input ref={inputRef} type="file" accept="image/*" onChange={handleFileChange} aria-label="Upload picture file" style={{ display: 'none' }} />
 
             {/* File info */}
             {file && (

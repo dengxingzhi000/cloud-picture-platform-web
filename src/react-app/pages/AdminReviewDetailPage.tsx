@@ -15,14 +15,7 @@ import { listTags, type TagInfo } from '@/api/tags'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Input } from '@/react-app/ui/shadcn/input'
 import { Textarea } from '@/react-app/ui/shadcn/textarea'
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
-}
+import { formatBytes } from '@/utils/format'
 
 function ReviewStatusBadge({ status }: { status: string }) {
   const cfg: Record<string, { bg: string; color: string }> = {
@@ -179,7 +172,7 @@ export default function AdminReviewDetailPage() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20 }}>
+      <div className="responsive-two-col" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20 }}>
         {/* Left — Asset panel */}
         <section className="panel">
           <h2 style={{ margin: '0 0 16px', fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-soft)', fontWeight: 700 }}>
@@ -270,6 +263,7 @@ export default function AdminReviewDetailPage() {
                         )}
                         <button
                           onClick={() => void removeTag(tag)}
+                          aria-label={`Remove tag ${tag.tagText}`}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: '1rem', lineHeight: 1, padding: 0 }}
                         >
                           ×

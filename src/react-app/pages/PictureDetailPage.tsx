@@ -11,6 +11,7 @@ import {
 import { listTags, type TagInfo } from '@/api/tags'
 import { useAuth } from '@/react-app/auth'
 import { Button } from '@/react-app/ui/shadcn/button'
+import { formatBytes } from '@/utils/format'
 
 function statusColor(s: string) {
   return { APPROVED: '#116350', REJECTED: '#9a3412', PENDING: '#8a5c00' }[s] ?? '#5a524c'
@@ -39,12 +40,6 @@ function Chip({ label, value, accent }: { label: string; value: string; accent?:
       <span style={{ fontWeight: 700, fontSize: '0.92rem' }}>{value}</span>
     </div>
   )
-}
-
-function formatBytes(b: number) {
-  if (b < 1024) return `${b} B`
-  if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
-  return `${(b / 1024 / 1024).toFixed(2)} MB`
 }
 
 export default function PictureDetailPage() {
@@ -140,7 +135,7 @@ export default function PictureDetailPage() {
         ← Back
       </button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(280px, 0.9fr)', gap: 24, alignItems: 'start' }}>
+      <div className="responsive-two-col" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(280px, 0.9fr)', gap: 24, alignItems: 'start' }}>
         {/* Left: image */}
         <div>
           <div style={{
@@ -339,6 +334,7 @@ export default function PictureDetailPage() {
                   {canManageTags && (
                     <button
                       onClick={() => void removeTag(tag.id)}
+                      aria-label={`Remove tag ${tag.tagText}`}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 2px', color: 'inherit', fontSize: '1rem', lineHeight: 1 }}
                     >
                       ×
