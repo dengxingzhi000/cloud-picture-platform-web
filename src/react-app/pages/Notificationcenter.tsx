@@ -161,11 +161,32 @@ export default function NotificationCenter() {
           height: 40,
           borderRadius: '50%',
           border: '1px solid var(--stroke-soft)',
-          background: open ? 'rgba(239,107,47,0.1)' : 'var(--bg-surface)',
+          background: open 
+            ? 'linear-gradient(135deg, rgba(239,107,47,0.15), rgba(239,107,47,0.08))' 
+            : 'linear-gradient(135deg, var(--bg-surface), var(--bg-elevated))',
           cursor: 'pointer',
           fontSize: '1rem',
           color: 'var(--ink-soft)',
-          transition: 'all 0.18s ease',
+          transition: 'all 0.2s ease',
+          boxShadow: open 
+            ? '0 4px 12px rgba(239,107,47,0.15)' 
+            : '0 2px 8px rgba(0,0,0,0.04)',
+        }}
+        onMouseEnter={(e) => {
+          if (!open) {
+            e.currentTarget.style.borderColor = 'var(--accent)'
+            e.currentTarget.style.color = 'var(--accent)'
+            e.currentTarget.style.transform = 'translateY(-1px)'
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(239,107,47,0.12)'
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!open) {
+            e.currentTarget.style.borderColor = 'var(--stroke-soft)'
+            e.currentTarget.style.color = 'var(--ink-soft)'
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'
+          }
         }}
       >
         🔔
@@ -212,17 +233,17 @@ export default function NotificationCenter() {
             position: 'absolute',
             top: 'calc(100% + 10px)',
             right: 0,
-            width: 360,
-            maxHeight: 480,
+            width: 380,
+            maxHeight: 520,
             background: 'var(--bg-surface)',
             borderRadius: 20,
             border: '1px solid var(--stroke-soft)',
-            boxShadow: '0 24px 60px rgba(30,20,10,0.18)',
+            boxShadow: '0 24px 60px rgba(30,20,10,0.18), 0 0 0 1px rgba(239,107,47,0.05)',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             zIndex: 100,
-            animation: 'slideDown 0.18s ease',
+            animation: 'slideDown 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
           }}
         >
           {/* Header */}
@@ -230,20 +251,22 @@ export default function NotificationCenter() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '14px 16px 10px',
+            padding: '16px 18px 12px',
             borderBottom: '1px solid var(--stroke-soft)',
+            background: 'linear-gradient(180deg, var(--bg-elevated), var(--bg-surface))',
             flexShrink: 0,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <strong style={{ fontSize: '0.95rem' }}>Notifications</strong>
+              <strong style={{ fontSize: '0.95rem', fontWeight: 700 }}>Notifications</strong>
               {unread > 0 && (
                 <span style={{
                   padding: '2px 8px',
                   borderRadius: 999,
-                  background: 'rgba(239,107,47,0.12)',
-                  color: 'var(--accent)',
+                  background: 'linear-gradient(135deg, #ef6b2f, #d6571f)',
+                  color: '#fff',
                   fontSize: '0.72rem',
                   fontWeight: 800,
+                  boxShadow: '0 2px 8px rgba(239,107,47,0.25)',
                 }}>
                   {unread} new
                 </span>
@@ -253,7 +276,23 @@ export default function NotificationCenter() {
               {unread > 0 && (
                 <button
                   onClick={markAllRead}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--accent)', fontWeight: 700 }}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontSize: '0.78rem', 
+                    color: 'var(--accent)', 
+                    fontWeight: 700,
+                    padding: '4px 8px',
+                    borderRadius: 8,
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(239,107,47,0.08)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'none'
+                  }}
                 >
                   Mark all read
                 </button>
@@ -261,7 +300,22 @@ export default function NotificationCenter() {
               {items.length > 0 && (
                 <button
                   onClick={clearAll}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--ink-soft)' }}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontSize: '0.78rem', 
+                    color: 'var(--ink-soft)',
+                    padding: '4px 8px',
+                    borderRadius: 8,
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'var(--bg-elevated)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'none'
+                  }}
                 >
                   Clear
                 </button>
@@ -293,16 +347,22 @@ export default function NotificationCenter() {
                       alignItems: 'flex-start',
                       gap: 12,
                       width: '100%',
-                      padding: '12px 16px',
-                      background: n.read ? 'transparent' : 'rgba(239,107,47,0.04)',
+                      padding: '14px 18px',
+                      background: n.read ? 'transparent' : 'linear-gradient(90deg, rgba(239,107,47,0.04), transparent)',
                       border: 'none',
                       borderBottom: '1px solid var(--stroke-soft)',
                       cursor: 'pointer',
                       textAlign: 'left',
-                      transition: 'background 0.15s ease',
+                      transition: 'all 0.15s ease',
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-elevated)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(239,107,47,0.04)')}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--bg-elevated)'
+                      e.currentTarget.style.transform = 'translateX(2px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = n.read ? 'transparent' : 'linear-gradient(90deg, rgba(239,107,47,0.04), transparent)'
+                      e.currentTarget.style.transform = 'translateX(0)'
+                    }}
                   >
                     {/* Icon */}
                     <div style={{
@@ -350,12 +410,13 @@ export default function NotificationCenter() {
 
           {/* Footer */}
           <div style={{
-            padding: '8px 16px',
+            padding: '10px 18px',
             borderTop: '1px solid var(--stroke-soft)',
+            background: 'var(--bg-elevated)',
             flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
+            gap: 8,
             fontSize: '0.72rem',
             color: '#94a3b8',
           }}>
@@ -370,8 +431,14 @@ export default function NotificationCenter() {
 
       <style>{`
         @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-8px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from { 
+            opacity: 0; 
+            transform: translateY(-8px) scale(0.96); 
+          }
+          to   { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+          }
         }
       `}</style>
     </div>

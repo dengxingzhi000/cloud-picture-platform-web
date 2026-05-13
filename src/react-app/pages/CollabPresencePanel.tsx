@@ -62,7 +62,6 @@ export default function CollabPresencePanel({
   onClearConflict,
 }: Props) {
   const iHoldLock = lock?.lockedByUserId === currentUserId
-  const someoneLocks = lock != null
 
   return (
     <div style={{ display: 'grid', gap: 14 }}>
