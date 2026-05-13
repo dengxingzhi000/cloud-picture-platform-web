@@ -54,7 +54,7 @@ The room bootstrap is intended for the next provider-backed collaboration phase,
 
 See:
 
-- [docs/frontend-refactor-plan.md](D:\ProgramProject\cloud-picture-platform-web\docs\frontend-refactor-plan.md)
+- [docs/frontend-refactor-plan.md](docs/frontend-refactor-plan.md)
 
 ## Structure
 
