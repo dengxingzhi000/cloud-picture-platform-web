@@ -5,15 +5,17 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { UserPlus } from 'lucide-react'
 import { useNotifications, type AppNotification, type NotificationKind } from './notifications'
 
-const KIND_ICON: Record<NotificationKind, string> = {
+const KIND_ICON: Record<NotificationKind, React.ReactNode> = {
   PICTURE_APPROVED:      '✅',
   PICTURE_REJECTED:      '❌',
   REVIEW_PENDING:        '🔍',
   TEAM_INVITE:           '📨',
   UPLOAD_COMPLETE:       '📤',
   TEAM_PICTURE_UPLOADED: '🖼️',
+  TEAM_MEMBER_JOINED:    <UserPlus size={16} />,
 }
 
 function relativeTime(iso: string) {
@@ -101,6 +103,8 @@ export default function NotificationBell() {
     if (notif.targetId) {
       if (notif.kind === 'TEAM_INVITE') {
         navigate('/teams')
+      } else if (notif.kind === 'TEAM_MEMBER_JOINED') {
+        navigate(`/teams/${notif.targetId}`)
       } else if (notif.kind === 'REVIEW_PENDING') {
         navigate(`/admin/reviews`)
       } else {
@@ -113,7 +117,7 @@ export default function NotificationBell() {
     <div ref={containerRef} style={{ position: 'relative' }}>
       {/* Bell button */}
       <button
-        onClick={() => { setOpen((o) => !o); if (!open && unreadCount > 0) markAllRead() }}
+        onClick={() => { setOpen((o) => !o) }}
         style={{
           position: 'relative',
           width: 40, height: 40,

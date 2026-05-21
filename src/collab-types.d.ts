@@ -82,6 +82,7 @@ export type NotificationKind =
   | 'TEAM_INVITE'
   | 'UPLOAD_COMPLETE'
   | 'TEAM_PICTURE_UPLOADED'
+  | 'TEAM_MEMBER_JOINED'
 
 export type NotificationMessage = {
   title?: string

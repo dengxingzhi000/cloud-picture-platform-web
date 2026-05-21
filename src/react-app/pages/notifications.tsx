@@ -21,6 +21,7 @@ export type NotificationKind =
   | 'TEAM_INVITE'
   | 'UPLOAD_COMPLETE'
   | 'TEAM_PICTURE_UPLOADED'
+  | 'TEAM_MEMBER_JOINED'
 
 export type AppNotification = {
   id: string
@@ -51,6 +52,7 @@ const KIND_TOAST: Record<NotificationKind, 'success' | 'info' | 'warn' | 'error'
   TEAM_INVITE:           'info',
   UPLOAD_COMPLETE:       'success',
   TEAM_PICTURE_UPLOADED: 'info',
+  TEAM_MEMBER_JOINED:    'info',
 }
 
 const KIND_EMOJI: Record<NotificationKind, string> = {
@@ -60,6 +62,7 @@ const KIND_EMOJI: Record<NotificationKind, string> = {
   TEAM_INVITE:           '📨',
   UPLOAD_COMPLETE:       '📤',
   TEAM_PICTURE_UPLOADED: '🖼️',
+  TEAM_MEMBER_JOINED:    '👥',
 }
 
 function makeId() {
