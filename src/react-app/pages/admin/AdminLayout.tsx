@@ -1,27 +1,13 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/react-app/auth'
+import { useMenu } from '@/react-app/menu'
 import NotificationBell from '@/react-app/pages/NotificationBell'
-
-type NavItem = {
-  key: string
-  label: string
-  icon: string
-  path: string
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: '⊞', path: '/admin' },
-  { key: 'reviews', label: 'Review Queue', icon: '◈', path: '/admin/reviews' },
-  { key: 'search', label: 'Search Index', icon: '◎', path: '/admin/search-index' },
-  { key: 'permissions', label: 'Permissions', icon: '◇', path: '/admin/permissions' },
-  { key: 'roles', label: 'Roles', icon: '⊡', path: '/admin/roles' },
-  { key: 'users', label: 'Users', icon: '◉', path: '/admin/users' },
-]
 
 const SIDEBAR_WIDTH = 240
 
 export default function AdminLayout() {
+  const { menus } = useMenu()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
@@ -93,10 +79,10 @@ export default function AdminLayout() {
 
         {/* Navigation */}
         <nav style={{ flex: 1, padding: '12px 8px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {NAV_ITEMS.map((item) => (
+          {menus.map((item) => (
             <NavLink
-              key={item.key}
-              to={item.path}
+              key={item.id}
+              to={item.path || '#'}
               end={item.path === '/admin'}
               style={({ isActive }) => ({
                 display: 'flex',
@@ -117,9 +103,9 @@ export default function AdminLayout() {
               })}
             >
               <span style={{ fontSize: '1.1rem', flexShrink: 0, width: 20, textAlign: 'center' }}>
-                {item.icon}
+                {item.icon || '•'}
               </span>
-              {!collapsed && <span>{item.label}</span>}
+              {!collapsed && <span>{item.name}</span>}
             </NavLink>
           ))}
         </nav>
