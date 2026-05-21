@@ -5,7 +5,7 @@ import { AuthProvider, useAuth } from '@/react-app/auth'
 import { updateProfile } from '@/api/auth'
 import { ThemeProvider, useTheme } from '@/react-app/theme'
 import { ToastProvider } from '@/react-app/toast'
-import { NotificationProvider } from '@/react-app/pages/notifications'
+import { NotificationProvider, useNotifications } from '@/react-app/pages/notifications'
 import NotificationBell from '@/react-app/pages/NotificationBell'
 import {
   AdminReviewDetailPage,
@@ -156,6 +156,7 @@ function ShellLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const [profileOpen, setProfileOpen] = useState(false)
+  const { unreadCount } = useNotifications()
 
   const navItems = [
     { label: t('nav.gallery'), path: '/gallery' },
@@ -187,8 +188,25 @@ function ShellLayout() {
               className={({ isActive }) =>
                 `nav-link${isActive || location.pathname.startsWith(item.path + '/') ? ' active' : ''}`
               }
+              style={{ position: 'relative' }}
             >
               {item.label}
+              {item.path === '/teams' && unreadCount > 0 && (
+                <span style={{
+                  position: 'absolute', top: -4, right: -6,
+                  minWidth: 16, height: 16,
+                  borderRadius: 999,
+                  background: 'var(--accent)',
+                  color: '#fff',
+                  fontSize: '0.6rem',
+                  fontWeight: 800,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '0 4px',
+                  lineHeight: 1,
+                }}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>

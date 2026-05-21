@@ -5,12 +5,19 @@
  * Place <NotificationProvider> inside <AuthProvider> and <ToastProvider> in App.tsx.
  */
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Client } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
 import { getToken } from '@/utils/auth'
 import { useToast } from '../toast'
 import { useAuth } from '@/react-app/auth'
+import {
+  getNotifications,
+  getUnreadCount as fetchUnreadCount,
+  markNotificationRead,
+  markAllNotificationsRead,
+  type NotificationItem,
+} from '@/api/notifications'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -76,11 +83,47 @@ function wsEndpoint() {
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
+function apiToNotification(item: NotificationItem): AppNotification {
+  return {
+    id: item.id,
+    title: item.title,
+    body: item.body ?? undefined,
+    kind: item.kind as NotificationKind | undefined,
+    targetId: item.targetId ?? undefined,
+    timestamp: item.createdAt,
+    read: item.read,
+  }
+}
+
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const { isAuthed, isAdmin } = useAuth()
   const { addToast } = useToast()
   const [notifications, setNotifications] = useState<AppNotification[]>([])
   const clientRef = useRef<Client | null>(null)
+
+  // Fetch persisted notifications and unread count on auth
+  useEffect(() => {
+    if (!isAuthed) return
+    getNotifications(0, 50).then((res) => {
+      setNotifications(res.items.map(apiToNotification))
+    }).catch(() => {})
+    fetchUnreadCount().then((count) => {
+      setNotifications((prev) => {
+        if (prev.length === 0) return prev
+        const unreadIds = new Set<string>()
+        let found = 0
+        for (const n of prev) {
+          if (!n.read) {
+            unreadIds.add(n.id)
+            found++
+            if (found >= count) break
+          }
+        }
+        if (unreadIds.size === 0) return prev
+        return prev.map((n) => unreadIds.has(n.id) ? n : { ...n, read: true })
+      })
+    }).catch(() => {})
+  }, [isAuthed])
 
   function addNotification(raw: {
     title?: string
@@ -161,11 +204,15 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthed, isAdmin]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const markRead = (id: string) =>
+  const markRead = useCallback((id: string) => {
+    markNotificationRead(id).catch(() => {})
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read: true } : n))
+  }, [])
 
-  const markAllRead = () =>
+  const markAllRead = useCallback(() => {
+    markAllNotificationsRead().catch(() => {})
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  }, [])
 
   const clearAll = () => setNotifications([])
 
