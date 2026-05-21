@@ -33,7 +33,12 @@ export default function LoginPage() {
     setSubmitting(true)
     try {
       const auth = await login({ usernameOrEmail, password })
-      applyAuth(auth.token, { userId: auth.userId, username: auth.username })
+      applyAuth(
+        auth.token,
+        { userId: auth.userInfo.userId, username: auth.userInfo.username },
+        auth.menus,
+        auth.userInfo.permissions,
+      )
       await refresh()
       nav(redirect)
     } catch {

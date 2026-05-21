@@ -16,6 +16,8 @@ import {
   setUser,
   type StoredUser,
 } from '@/utils/auth'
+import { MenuProvider, useMenu, type MenuItem } from '@/react-app/menu'
+import { PermissionProvider, usePermission } from '@/react-app/permission'
 
 type AuthContextValue = {
   user: StoredUser | null
@@ -23,39 +25,59 @@ type AuthContextValue = {
   isAdmin: boolean
   ready: boolean
   refresh: () => Promise<void>
-  applyAuth: (token: string, nextUser: StoredUser) => void
+  applyAuth: (token: string, nextUser: StoredUser, menus?: MenuItem[], permissions?: string[]) => void
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: PropsWithChildren) {
+  return (
+    <MenuProvider>
+      <PermissionProvider>
+        <AuthProviderInner>{children}</AuthProviderInner>
+      </PermissionProvider>
+    </MenuProvider>
+  )
+}
+
+function AuthProviderInner({ children }: PropsWithChildren) {
+  const { setMenus } = useMenu()
+  const { setPermissions } = usePermission()
   const [user, setUserState] = useState<StoredUser | null>(() => getUser())
   const [ready, setReady] = useState(false)
 
   async function refresh() {
     if (!getToken()) {
       setUserState(null)
+      setMenus([])
+      setPermissions([])
       setReady(true)
       return
     }
     try {
       const me = await fetchMe()
-      setUser(me)
-      setUserState(me)
+      setUser(me.userInfo)
+      setUserState(me.userInfo)
+      setMenus(me.menus)
+      setPermissions(me.userInfo.permissions ?? [])
     } catch {
       clearToken()
       clearUser()
       setUserState(null)
+      setMenus([])
+      setPermissions([])
     } finally {
       setReady(true)
     }
   }
 
-  function applyAuth(token: string, nextUser: StoredUser) {
+  function applyAuth(token: string, nextUser: StoredUser, menus?: MenuItem[], permissions?: string[]) {
     setToken(token)
     setUser(nextUser)
     setUserState(nextUser)
+    if (menus) setMenus(menus)
+    if (permissions) setPermissions(permissions)
     setReady(true)
   }
 
@@ -63,6 +85,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
     clearToken()
     clearUser()
     setUserState(null)
+    setMenus([])
+    setPermissions([])
     setReady(true)
   }
 

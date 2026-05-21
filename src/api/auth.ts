@@ -1,5 +1,6 @@
 import api, { unwrap } from '@/api/client'
 import type { ApiResponse } from '@/api/client'
+import type { MenuItem } from '@/react-app/menu'
 
 export type AuthResponse = {
   userId: string
@@ -14,11 +15,24 @@ export type UserInfo = {
   displayName?: string | null
   email?: string | null
   avatarUrl?: string | null
-  role?: 'USER' | 'ADMIN'
+  roles?: string[]
+  permissions?: string[]
+}
+
+export type LoginResponse = {
+  token: string
+  expiresAt: string
+  userInfo: UserInfo
+  menus: MenuItem[]
+}
+
+export type UserInfoWithMenusResponse = {
+  userInfo: UserInfo
+  menus: MenuItem[]
 }
 
 export async function login(payload: { usernameOrEmail: string; password: string }) {
-  const response = await api.post<ApiResponse<AuthResponse>>('/api/auth/login', payload)
+  const response = await api.post<ApiResponse<LoginResponse>>('/api/auth/login', payload)
   return unwrap(response.data)
 }
 
@@ -33,7 +47,7 @@ export async function register(payload: {
 }
 
 export async function fetchMe() {
-  const response = await api.get<ApiResponse<UserInfo>>('/api/auth/me')
+  const response = await api.get<ApiResponse<UserInfoWithMenusResponse>>('/api/auth/me')
   return unwrap(response.data)
 }
 
