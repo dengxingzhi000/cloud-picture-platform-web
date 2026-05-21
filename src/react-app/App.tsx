@@ -2,6 +2,7 @@ import { FormEvent, Suspense, lazy, useEffect, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { BrowserRouter, NavLink, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/react-app/auth'
+import { useMenu } from '@/react-app/menu'
 import { updateProfile } from '@/api/auth'
 import { ThemeProvider, useTheme } from '@/react-app/theme'
 import { ToastProvider } from '@/react-app/toast'
@@ -285,15 +286,38 @@ function RequireAuth() {
   return <Outlet />
 }
 
-function RequireAdmin() {
-  const { isAdmin, ready } = useAuth()
+function ForbiddenPage() {
   const { t } = useTranslation()
+  return (
+    <div className="page">
+      <section className="panel" style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <h1>403</h1>
+        <p>{t('forbidden.message', 'You do not have permission to access this page.')}</p>
+        <NavLink to="/gallery">{t('forbidden.backToHome', 'Back to Home')}</NavLink>
+      </section>
+    </div>
+  )
+}
+
+function RequireAdmin() {
+  const { ready } = useAuth()
+  const { flattenMenuPaths } = useMenu()
+  const location = useLocation()
+  const { t } = useTranslation()
+
   if (!ready) {
     return <div className="page"><section className="panel">{t('common.loading')}</section></div>
   }
-  if (!isAdmin) {
-    return <Navigate to="/gallery" replace />
+
+  const allowedPaths = flattenMenuPaths()
+  const isAllowed = allowedPaths.some(path =>
+    location.pathname === path || location.pathname.startsWith(path + '/')
+  )
+
+  if (!isAllowed) {
+    return <Navigate to="/403" replace />
   }
+
   return <Outlet />
 }
 
@@ -303,6 +327,7 @@ function AppRoutes() {
     <Suspense fallback={<div className="page"><section className="panel">{t('common.loading')}</section></div>}>
       <Routes>
         <Route path="/" element={<Navigate to="/gallery" replace />} />
+        <Route path="/403" element={<ForbiddenPage />} />
         <Route element={<ShellLayout />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
