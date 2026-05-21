@@ -7,3 +7,4 @@ export { default as TiltedCard } from './TiltedCard/TiltedCard';
 export { default as LazyWrapper } from './LazyWrapper/LazyWrapper';
 export { default as CollabCanvas } from './CollabCanvas';
 export { default as StandardPictureEditor } from './StandardPictureEditor';
+export { Permission } from './Permission';
