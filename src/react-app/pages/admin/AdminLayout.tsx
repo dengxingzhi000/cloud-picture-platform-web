@@ -16,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { key: 'search', label: 'Search Index', icon: '◎', path: '/admin/search-index' },
   { key: 'permissions', label: 'Permissions', icon: '◇', path: '/admin/permissions' },
   { key: 'roles', label: 'Roles', icon: '⊡', path: '/admin/roles' },
+  { key: 'users', label: 'Users', icon: '◉', path: '/admin/users' },
 ]
 
 const SIDEBAR_WIDTH = 240

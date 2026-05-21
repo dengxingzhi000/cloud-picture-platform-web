@@ -34,6 +34,7 @@ const AdminDashboardPage = lazy(() => import('@/react-app/pages/admin/AdminDashb
 const AdminSearchPage = lazy(() => import('@/react-app/pages/AdminSearchPage'))
 const AdminPermissionsPage = lazy(() => import('@/react-app/pages/admin/AdminPermissionsPage'))
 const AdminRolesPage = lazy(() => import('@/react-app/pages/admin/AdminRolesPage'))
+const AdminUsersPage = lazy(() => import('@/react-app/pages/admin/AdminUsersPage'))
 
 function SettingsDialog({
   open,
@@ -325,6 +326,7 @@ function AppRoutes() {
               <Route path="search-index" element={<AdminSearchPage />} />
               <Route path="permissions" element={<AdminPermissionsPage />} />
               <Route path="roles" element={<AdminRolesPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
             </Route>
           </Route>
         </Route>
