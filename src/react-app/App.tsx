@@ -32,6 +32,8 @@ const PictureEditPage = lazy(() => import('@/react-app/pages/PictureEditPage'))
 const AdminLayout = lazy(() => import('@/react-app/pages/admin/AdminLayout'))
 const AdminDashboardPage = lazy(() => import('@/react-app/pages/admin/AdminDashboardPage'))
 const AdminSearchPage = lazy(() => import('@/react-app/pages/AdminSearchPage'))
+const AdminPermissionsPage = lazy(() => import('@/react-app/pages/admin/AdminPermissionsPage'))
+const AdminRolesPage = lazy(() => import('@/react-app/pages/admin/AdminRolesPage'))
 
 function SettingsDialog({
   open,
@@ -321,6 +323,8 @@ function AppRoutes() {
               <Route path="reviews" element={<AdminReviewListPage />} />
               <Route path="reviews/:id" element={<AdminReviewDetailPage />} />
               <Route path="search-index" element={<AdminSearchPage />} />
+              <Route path="permissions" element={<AdminPermissionsPage />} />
+              <Route path="roles" element={<AdminRolesPage />} />
             </Route>
           </Route>
         </Route>
