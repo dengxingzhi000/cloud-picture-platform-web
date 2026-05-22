@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
     "@gsap/react": "^2.1.2",
     "@hocuspocus/provider": "^2.15.2",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -39,7 +40,8 @@
     "three": "^0.184.0",
     "y-indexeddb": "^9.0.12",
     "y-websocket": "^2.1.0",
-    "yjs": "^13.6.24"
+    "yjs": "^13.6.24",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

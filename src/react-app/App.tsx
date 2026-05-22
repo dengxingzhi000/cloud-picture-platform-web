@@ -36,6 +36,7 @@ const AdminSearchPage = lazy(() => import('@/react-app/pages/AdminSearchPage'))
 const AdminPermissionsPage = lazy(() => import('@/react-app/pages/admin/AdminPermissionsPage'))
 const AdminRolesPage = lazy(() => import('@/react-app/pages/admin/AdminRolesPage'))
 const AdminUsersPage = lazy(() => import('@/react-app/pages/admin/AdminUsersPage'))
+const ExcalidrawPage = lazy(() => import('@/react-app/pages/ExcalidrawPage'))
 
 function SettingsDialog({
   open,
@@ -348,6 +349,12 @@ function AppRoutes() {
             <Route path="/pictures/:id/edit" element={<PictureEditPage />} />
             <Route path="/tags" element={<TagsPage />} />
           </Route>
+        </Route>
+        {/* Excalidraw - full screen without shell layout */}
+        <Route element={<RequireAuth />}>
+          <Route path="/excalidraw" element={<ExcalidrawPage />} />
+          <Route path="/excalidraw/:sceneId" element={<ExcalidrawPage />} />
+          <Route path="/pictures/:pictureId/excalidraw" element={<ExcalidrawPage />} />
         </Route>
         {/* Admin portal — separate layout */}
         <Route element={<RequireAuth />}>
