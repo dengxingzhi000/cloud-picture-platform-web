@@ -299,6 +299,14 @@ function ForbiddenPage() {
   )
 }
 
+function RootRedirect() {
+  const { isAuthed, isAdmin } = useAuth()
+  if (!isAuthed) {
+    return <Navigate to="/login" replace />
+  }
+  return <Navigate to={isAdmin ? '/admin' : '/gallery'} replace />
+}
+
 function RequireAdmin() {
   const { ready } = useAuth()
   const { flattenMenuPaths } = useMenu()
@@ -326,7 +334,7 @@ function AppRoutes() {
   return (
     <Suspense fallback={<div className="page"><section className="panel">{t('common.loading')}</section></div>}>
       <Routes>
-        <Route path="/" element={<Navigate to="/gallery" replace />} />
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/403" element={<ForbiddenPage />} />
         <Route element={<ShellLayout />}>
           <Route path="/login" element={<LoginPage />} />

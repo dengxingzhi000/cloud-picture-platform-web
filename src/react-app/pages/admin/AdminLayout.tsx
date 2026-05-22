@@ -6,6 +6,15 @@ import NotificationBell from '@/react-app/pages/NotificationBell'
 
 const SIDEBAR_WIDTH = 240
 
+const iconMap: Record<string, string> = {
+  'layout-dashboard': '⊞',
+  'shield-check': '✓',
+  'users': '👥',
+  'user-cog': '⚙',
+  'key': '🔑',
+  'search': '🔍',
+}
+
 export default function AdminLayout() {
   const { menus } = useMenu()
   const { user, logout } = useAuth()
@@ -102,10 +111,16 @@ export default function AdminLayout() {
                 whiteSpace: 'nowrap',
               })}
             >
-              <span style={{ fontSize: '1.1rem', flexShrink: 0, width: 20, textAlign: 'center' }}>
-                {item.icon || '•'}
+              <span style={{ fontSize: '1.1rem', flexShrink: 0, width: 20, textAlign: 'center', overflow: 'hidden' }}>
+                {iconMap[item.icon] || '•'}
               </span>
-              {!collapsed && <span>{item.name}</span>}
+              {!collapsed && <span style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                flex: 1,
+                minWidth: 0,
+              }}>{item.name}</span>}
             </NavLink>
           ))}
         </nav>

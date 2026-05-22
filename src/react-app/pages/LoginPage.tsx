@@ -40,7 +40,15 @@ export default function LoginPage() {
         auth.userInfo.permissions,
       )
       await refresh()
-      nav(redirect)
+      // Determine redirect — admin goes to /admin by default
+      const sp = new URLSearchParams(location.search)
+      const explicitRedirect = sp.get('redirect')
+      if (explicitRedirect) {
+        nav(explicitRedirect)
+      } else {
+        const isAdmin = auth.userInfo.roles?.some(r => r === 'ROLE_ADMIN' || r === 'ADMIN')
+        nav(isAdmin ? '/admin' : '/gallery')
+      }
     } catch {
       setError(t('login.requestFailed'))
     } finally {

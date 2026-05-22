@@ -57,8 +57,16 @@ function AuthProviderInner({ children }: PropsWithChildren) {
     }
     try {
       const me = await fetchMe()
-      setUser(me.userInfo)
-      setUserState(me.userInfo)
+      const mappedUser: StoredUser = {
+        userId: me.userInfo.userId,
+        username: me.userInfo.username,
+        displayName: me.userInfo.displayName,
+        email: me.userInfo.email,
+        avatarUrl: me.userInfo.avatarUrl,
+        role: me.userInfo.roles?.some(r => r === 'ROLE_ADMIN' || r === 'ADMIN') ? 'ADMIN' : 'USER',
+      }
+      setUser(mappedUser)
+      setUserState(mappedUser)
       setMenus(me.menus)
       setPermissions(me.userInfo.permissions ?? [])
     } catch {
