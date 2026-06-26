@@ -32,7 +32,7 @@ export type UserInfoWithMenusResponse = {
 }
 
 export async function login(payload: { usernameOrEmail: string; password: string }) {
-  const response = await api.post<ApiResponse<LoginResponse>>('/api/auth/login', payload)
+  const response = await api.post<ApiResponse<LoginResponse>>('/api/v1/auth/login', payload)
   return unwrap(response.data)
 }
 
@@ -42,16 +42,16 @@ export async function register(payload: {
   password: string
   displayName?: string
 }) {
-  const response = await api.post<ApiResponse<AuthResponse>>('/api/auth/register', payload)
+  const response = await api.post<ApiResponse<AuthResponse>>('/api/v1/auth/register', payload)
   return unwrap(response.data)
 }
 
 export async function fetchMe() {
-  const response = await api.get<ApiResponse<UserInfoWithMenusResponse>>('/api/auth/me')
+  const response = await api.get<ApiResponse<UserInfoWithMenusResponse>>('/api/v1/auth/me')
   return unwrap(response.data)
 }
 
 export async function updateProfile(payload: { displayName?: string; avatarUrl?: string | null }) {
-  const response = await api.patch<ApiResponse<UserInfo>>('/api/auth/me', payload)
+  const response = await api.patch<ApiResponse<UserInfo>>('/api/v1/auth/me', payload)
   return unwrap(response.data)
 }

@@ -18,14 +18,14 @@ export interface PageResponse<T> {
 }
 
 export async function getNotifications(page = 0, size = 50) {
-  const res = await client.get<PageResponse<NotificationItem>>('/api/notifications', {
+  const res = await client.get<PageResponse<NotificationItem>>('/api/v1/notifications', {
     params: { page, size },
   });
   return res.data;
 }
 
 export async function getUnreadCount() {
-  const res = await client.get<{ count: number }>('/api/notifications/unread-count');
+  const res = await client.get<{ count: number }>('/api/v1/notifications/unread-count');
   return res.data.count;
 }
 
@@ -34,5 +34,5 @@ export async function markNotificationRead(id: string) {
 }
 
 export async function markAllNotificationsRead() {
-  await client.patch('/api/notifications/read-all');
+  await client.patch('/api/v1/notifications/read-all');
 }

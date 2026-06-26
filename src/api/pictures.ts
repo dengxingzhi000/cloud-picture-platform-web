@@ -166,7 +166,7 @@ export async function listPublic(params: {
   maxSizeBytes?: number
   orientation?: 'LANDSCAPE' | 'PORTRAIT' | 'SQUARE'
 }) {
-  const response = await api.get<ApiResponse<PageResponse<PictureSummary>>>('/api/pictures/public', {
+  const response = await api.get<ApiResponse<PageResponse<PictureSummary>>>('/api/v1/pictures/public', {
     params,
   })
   return unwrap(response.data)
@@ -174,7 +174,7 @@ export async function listPublic(params: {
 
 export async function listRecommendations(params: { page?: number; size?: number }) {
   const response = await api.get<ApiResponse<PageResponse<PictureSummary>>>(
-    '/api/pictures/recommendations',
+    '/api/v1/pictures/recommendations',
     { params }
   )
   return unwrap(response.data)
@@ -198,7 +198,7 @@ export async function searchPictures(params: {
   sortBy?: 'createdAt' | 'updatedAt' | 'sizeBytes'
   sortDir?: 'asc' | 'desc'
 }) {
-  const response = await api.get<ApiResponse<PageResponse<PictureSummary>>>('/api/pictures/search', {
+  const response = await api.get<ApiResponse<PageResponse<PictureSummary>>>('/api/v1/pictures/search', {
     params,
   })
   return unwrap(response.data)
@@ -215,7 +215,7 @@ export async function uploadPicture(payload: {
   formData.append('visibility', payload.visibility)
   if (payload.name) formData.append('name', payload.name)
   if (payload.spaceId) formData.append('spaceId', payload.spaceId)
-  const response = await api.post<ApiResponse<PictureResponse>>('/api/pictures/upload', formData)
+  const response = await api.post<ApiResponse<PictureResponse>>('/api/v1/pictures/upload', formData)
   return unwrap(response.data)
 }
 
@@ -230,12 +230,12 @@ export async function uploadPictureWithDeduplication(payload: {
   formData.append('visibility', payload.visibility)
   if (payload.name) formData.append('name', payload.name)
   if (payload.spaceId) formData.append('spaceId', payload.spaceId)
-  const response = await api.post<ApiResponse<PictureResponse>>('/api/pictures/upload/deduplication', formData)
+  const response = await api.post<ApiResponse<PictureResponse>>('/api/v1/pictures/upload/deduplication', formData)
   return unwrap(response.data)
 }
 
 export async function checkDuplicatePicture(sha256Hash: string) {
-  const response = await api.get<ApiResponse<RapidUploadCheckResponse>>('/api/pictures/check-duplicate', {
+  const response = await api.get<ApiResponse<RapidUploadCheckResponse>>('/api/v1/pictures/check-duplicate', {
     params: { sha256Hash },
   })
   return unwrap(response.data)
@@ -274,14 +274,14 @@ export async function refreshPictureCollaborationRoom(pictureId: string) {
 
 export async function listPending(page = 0, size = 20) {
   const response = await api.get<ApiResponse<PageResponse<AdminPictureSummary>>>(
-    '/api/admin/pictures/pending',
+    '/api/v1/admin/pictures/pending',
     { params: { page, size } }
   )
   return unwrap(response.data)
 }
 
 export async function getAdminPicture(pictureId: string) {
-  const response = await api.get<ApiResponse<AdminPictureSummary>>(`/api/admin/pictures/${pictureId}`)
+  const response = await api.get<ApiResponse<AdminPictureSummary>>(`/api/v1/admin/pictures/${pictureId}`)
   return unwrap(response.data)
 }
 
@@ -300,7 +300,7 @@ export async function listReviews(
   }
 ) {
   const response = await api.get<ApiResponse<PageResponse<ModerationRecord>>>(
-    `/api/admin/pictures/${pictureId}/reviews`,
+    `/api/v1/admin/pictures/${pictureId}/reviews`,
     { params }
   )
   return unwrap(response.data)
@@ -308,7 +308,7 @@ export async function listReviews(
 
 export async function reviewPicture(pictureId: string, payload: { status: 'APPROVED' | 'REJECTED'; reason?: string }) {
   const response = await api.post<ApiResponse<PictureResponse>>(
-    `/api/admin/pictures/${pictureId}/review`,
+    `/api/v1/admin/pictures/${pictureId}/review`,
     payload
   )
   return unwrap(response.data)
@@ -358,7 +358,7 @@ export async function exportReviews(params: {
   sortDir?: string
   limit?: number
 }) {
-  const response = await api.get('/api/admin/pictures/reviews/export', {
+  const response = await api.get('/api/v1/admin/pictures/reviews/export', {
     params,
     responseType: 'blob',
   })
@@ -373,13 +373,13 @@ export type SearchReindexResponse = {
 }
 
 export async function reindexAllPictures() {
-  const response = await api.post<ApiResponse<SearchReindexResponse>>('/api/admin/search/reindex')
+  const response = await api.post<ApiResponse<SearchReindexResponse>>('/api/v1/admin/search/reindex')
   return unwrap(response.data)
 }
 
 export async function reindexSinglePicture(pictureId: string) {
   const response = await api.post<ApiResponse<SearchReindexResponse>>(
-    `/api/admin/search/pictures/${pictureId}/reindex`
+    `/api/v1/admin/search/pictures/${pictureId}/reindex`
   )
   return unwrap(response.data)
 }
