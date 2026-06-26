@@ -22,7 +22,7 @@ export interface UpdateSnapshotRequest {
 }
 
 export async function createScene(req: CreateExcalidrawSceneRequest): Promise<ExcalidrawSceneResponse> {
-  return unwrap((await api.post<{ data: ExcalidrawSceneResponse }>('/api/scenes', req)).data as any)
+  return unwrap((await api.post<{ data: ExcalidrawSceneResponse }>('/api/v1/scenes', req)).data as any)
 }
 
 export async function getScene(sceneId: string): Promise<ExcalidrawSceneResponse> {

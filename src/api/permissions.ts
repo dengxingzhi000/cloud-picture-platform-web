@@ -29,26 +29,26 @@ export type PermissionUpdateRequest = {
 export async function listPermissions(page = 0, size = 20, resource?: string) {
   const params: Record<string, string | number> = { page, size }
   if (resource) params.resource = resource
-  const response = await api.get<ApiResponse<PageResponse<PermissionItem>>>('/api/admin/permissions', { params })
+  const response = await api.get<ApiResponse<PageResponse<PermissionItem>>>('/api/v1/admin/permissions', { params })
   return unwrap(response.data)
 }
 
 export async function getPermission(id: string) {
-  const response = await api.get<ApiResponse<PermissionItem>>(`/api/admin/permissions/${id}`)
+  const response = await api.get<ApiResponse<PermissionItem>>(`/api/v1/admin/permissions/${id}`)
   return unwrap(response.data)
 }
 
 export async function createPermission(data: PermissionCreateRequest) {
-  const response = await api.post<ApiResponse<PermissionItem>>('/api/admin/permissions', data)
+  const response = await api.post<ApiResponse<PermissionItem>>('/api/v1/admin/permissions', data)
   return unwrap(response.data)
 }
 
 export async function updatePermission(id: string, data: PermissionUpdateRequest) {
-  const response = await api.put<ApiResponse<PermissionItem>>(`/api/admin/permissions/${id}`, data)
+  const response = await api.put<ApiResponse<PermissionItem>>(`/api/v1/admin/permissions/${id}`, data)
   return unwrap(response.data)
 }
 
 export async function deletePermission(id: string) {
-  const response = await api.delete<ApiResponse<void>>(`/api/admin/permissions/${id}`)
+  const response = await api.delete<ApiResponse<void>>(`/api/v1/admin/permissions/${id}`)
   unwrap(response.data)
 }

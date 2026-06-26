@@ -8,12 +8,12 @@ export type TagInfo = {
 }
 
 export async function listTags(params: { page?: number; size?: number; keyword?: string }) {
-  const response = await api.get<ApiResponse<PageResponse<TagInfo>>>('/api/tags', { params })
+  const response = await api.get<ApiResponse<PageResponse<TagInfo>>>('/api/v1/tags', { params })
   return unwrap(response.data)
 }
 
 export async function createTag(payload: { name: string }) {
-  const response = await api.post<ApiResponse<TagInfo>>('/api/tags', payload)
+  const response = await api.post<ApiResponse<TagInfo>>('/api/v1/tags', payload)
   return unwrap(response.data)
 }
 

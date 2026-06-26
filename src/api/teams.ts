@@ -70,12 +70,12 @@ export type TeamMemberEvent = {
 }
 
 export async function listTeams() {
-  const response = await api.get<ApiResponse<TeamSummary[]>>('/api/teams')
+  const response = await api.get<ApiResponse<TeamSummary[]>>('/api/v1/teams')
   return unwrap(response.data)
 }
 
 export async function createTeam(payload: { name: string; description?: string }) {
-  const response = await api.post<ApiResponse<TeamDetail>>('/api/teams', payload)
+  const response = await api.post<ApiResponse<TeamDetail>>('/api/v1/teams', payload)
   return unwrap(response.data)
 }
 
@@ -121,7 +121,7 @@ export async function listInviteHistory(
 }
 
 export async function listMyInvites() {
-  const response = await api.get<ApiResponse<TeamInviteSummary[]>>('/api/teams/invites')
+  const response = await api.get<ApiResponse<TeamInviteSummary[]>>('/api/v1/teams/invites')
   return unwrap(response.data)
 }
 

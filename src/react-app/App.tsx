@@ -8,6 +8,7 @@ import { ThemeProvider, useTheme } from '@/react-app/theme'
 import { ToastProvider } from '@/react-app/toast'
 import { NotificationProvider, useNotifications } from '@/react-app/pages/notifications'
 import NotificationBell from '@/react-app/pages/NotificationBell'
+import AiChatPanel from '@/react-app/components/AiChatPanel'
 import {
   AdminReviewDetailPage,
   AdminReviewListPage,
@@ -270,6 +271,7 @@ function ShellLayout() {
         <Outlet />
       </main>
       <SettingsDialog open={profileOpen} onOpenChange={setProfileOpen} />
+      <AiChatPanel />
     </div>
   )
 }

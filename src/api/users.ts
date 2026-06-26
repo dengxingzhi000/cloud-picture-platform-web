@@ -16,6 +16,6 @@ export async function listUsers(keyword?: string, status?: string, page = 0, siz
   const params: Record<string, string | number> = { page, size }
   if (keyword) params.keyword = keyword
   if (status) params.status = status
-  const response = await api.get<ApiResponse<PageResponse<AdminUserSummary>>>('/api/admin/users', { params })
+  const response = await api.get<ApiResponse<PageResponse<AdminUserSummary>>>('/api/v1/admin/users', { params })
   return unwrap(response.data)
 }
