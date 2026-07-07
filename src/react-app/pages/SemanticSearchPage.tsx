@@ -21,7 +21,7 @@ export default function SemanticSearchPage() {
     try {
       const res = await semanticSearch({ query: query.trim(), size: 20 })
       setResults(res.items)
-    } catch { addToast(t('common.error'), 'error') }
+    } catch { addToast(t('common.error'), 'error') } finally {
       setLoading(false)
     }
   }
