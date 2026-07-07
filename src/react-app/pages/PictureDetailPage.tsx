@@ -11,6 +11,7 @@ import {
 import { listTags, type TagInfo } from '@/api/tags'
 import { useAuth } from '@/react-app/auth'
 import { Button } from '@/react-app/ui/shadcn/button'
+import CommentSection from '@/react-app/components/CommentSection'
 import { formatBytes } from '@/utils/format'
 
 function statusColor(s: string) {
@@ -356,6 +357,11 @@ export default function PictureDetailPage() {
               </code>
             </section>
           )}
+
+          {/* Comments */}
+          <section className="panel" style={{ padding: 20 }}>
+            <CommentSection pictureId={pictureId} />
+          </section>
         </div>
       </div>
     </div>

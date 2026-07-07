@@ -16,6 +16,7 @@ const resources = {
         remove: 'Remove',
         creating: 'Creating...',
         create: 'Create',
+        delete: 'Delete',
       },
       nav: {
         gallery: 'Public Gallery',
@@ -108,6 +109,15 @@ const resources = {
         setCover: 'Set as Cover',
         confirmDelete: 'Delete this album?',
       },
+      comments: {
+        title: 'Comments',
+        placeholder: 'Write a comment...',
+        post: 'Post',
+        empty: 'No comments yet',
+        resolve: 'Resolve',
+        resolved: 'Resolved',
+        delete: 'Delete',
+      },
     },
   },
   'zh-CN': {
@@ -124,6 +134,7 @@ const resources = {
         remove: '移除',
         creating: '创建中...',
         create: '创建',
+        delete: '删除',
       },
       nav: {
         gallery: '公共图库',
@@ -215,6 +226,15 @@ const resources = {
         pictureCount: '{{count}} 张图片',
         setCover: '设为封面',
         confirmDelete: '确定要删除此相册吗？',
+      },
+      comments: {
+        title: '评论',
+        placeholder: '写下你的评论...',
+        post: '发表',
+        empty: '暂无评论',
+        resolve: '标记已解决',
+        resolved: '已解决',
+        delete: '删除',
       },
     },
   },
