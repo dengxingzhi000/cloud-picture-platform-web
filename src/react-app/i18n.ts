@@ -118,6 +118,13 @@ const resources = {
         resolved: 'Resolved',
         delete: 'Delete',
       },
+      versions: {
+        title: 'Version History',
+        createSnapshot: 'Create Snapshot',
+        empty: 'No versions yet',
+        version: 'Version',
+        download: 'Download',
+      },
     },
   },
   'zh-CN': {
@@ -235,6 +242,13 @@ const resources = {
         resolve: '标记已解决',
         resolved: '已解决',
         delete: '删除',
+      },
+      versions: {
+        title: '版本历史',
+        createSnapshot: '创建快照',
+        empty: '暂无版本记录',
+        version: '版本',
+        download: '下载',
       },
     },
   },
