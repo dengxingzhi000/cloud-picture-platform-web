@@ -38,6 +38,12 @@ const AdminPermissionsPage = lazy(() => import('@/react-app/pages/admin/AdminPer
 const AdminRolesPage = lazy(() => import('@/react-app/pages/admin/AdminRolesPage'))
 const AdminUsersPage = lazy(() => import('@/react-app/pages/admin/AdminUsersPage'))
 const ExcalidrawPage = lazy(() => import('@/react-app/pages/ExcalidrawPage'))
+const AlbumsPage = lazy(() => import('@/react-app/pages/AlbumsPage'))
+const AlbumDetailPage = lazy(() => import('@/react-app/pages/AlbumDetailPage'))
+const RagPage = lazy(() => import('@/react-app/pages/RagPage'))
+const SemanticSearchPage = lazy(() => import('@/react-app/pages/SemanticSearchPage'))
+const DeveloperPage = lazy(() => import('@/react-app/pages/DeveloperPage'))
+const WebhooksPage = lazy(() => import('@/react-app/pages/WebhooksPage'))
 
 function SettingsDialog({
   open,
@@ -168,8 +174,11 @@ function ShellLayout() {
     { label: t('nav.gallery'), path: '/gallery' },
     { label: t('nav.search'), path: '/search', auth: true },
     { label: t('nav.upload'), path: '/upload', auth: true },
+    { label: t('nav.albums'), path: '/albums', auth: true },
     { label: t('nav.teams'), path: '/teams', auth: true },
     { label: t('nav.tags'), path: '/tags', auth: true },
+    { label: t('nav.rag'), path: '/rag', auth: true },
+    { label: t('nav.developer'), path: '/developer', auth: true },
   ]
 
   const visibleNavItems = navItems.filter(
@@ -350,6 +359,12 @@ function AppRoutes() {
             <Route path="/pictures/:id" element={<PictureDetailPage />} />
             <Route path="/pictures/:id/edit" element={<PictureEditPage />} />
             <Route path="/tags" element={<TagsPage />} />
+            <Route path="/albums" element={<AlbumsPage />} />
+            <Route path="/albums/:id" element={<AlbumDetailPage />} />
+            <Route path="/rag" element={<RagPage />} />
+            <Route path="/semantic-search" element={<SemanticSearchPage />} />
+            <Route path="/developer" element={<DeveloperPage />} />
+            <Route path="/webhooks" element={<WebhooksPage />} />
           </Route>
         </Route>
         {/* Excalidraw - full screen without shell layout */}
