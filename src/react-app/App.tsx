@@ -41,6 +41,7 @@ const ExcalidrawPage = lazy(() => import('@/react-app/pages/ExcalidrawPage'))
 const AlbumsPage = lazy(() => import('@/react-app/pages/AlbumsPage'))
 const AlbumDetailPage = lazy(() => import('@/react-app/pages/AlbumDetailPage'))
 const RagPage = lazy(() => import('@/react-app/pages/RagPage'))
+const SemanticSearchPage = lazy(() => import('@/react-app/pages/SemanticSearchPage'))
 
 function SettingsDialog({
   open,
@@ -358,6 +359,7 @@ function AppRoutes() {
             <Route path="/albums" element={<AlbumsPage />} />
             <Route path="/albums/:id" element={<AlbumDetailPage />} />
             <Route path="/rag" element={<RagPage />} />
+            <Route path="/semantic-search" element={<SemanticSearchPage />} />
           </Route>
         </Route>
         {/* Excalidraw - full screen without shell layout */}

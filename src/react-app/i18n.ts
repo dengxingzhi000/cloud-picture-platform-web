@@ -19,6 +19,8 @@ const resources = {
         delete: 'Delete',
         confirm: 'Confirm',
         uploading: 'Uploading...',
+        searching: 'Searching...',
+        search: 'Search',
       },
       batch: {
         selected: '{{count}} selected',
@@ -152,6 +154,12 @@ const resources = {
         sources: 'Sources',
         error: 'Sorry, an error occurred. Please try again later.',
       },
+      semantic: {
+        title: 'Semantic Search',
+        placeholder: "Describe what you're looking for in natural language...",
+        noResults: 'No matching pictures found',
+        score: 'Relevance',
+      },
     },
   },
   'zh-CN': {
@@ -171,6 +179,8 @@ const resources = {
         delete: '删除',
         confirm: '确定',
         uploading: '上传中...',
+        searching: '搜索中...',
+        search: '搜索',
       },
       batch: {
         selected: '已选择 {{count}} 项',
@@ -303,6 +313,12 @@ const resources = {
         send: '发送',
         sources: '参考来源',
         error: '抱歉，处理请求时出现错误，请稍后重试。',
+      },
+      semantic: {
+        title: '语义搜索',
+        placeholder: '用自然语言描述你想找的图片...',
+        noResults: '未找到匹配的图片',
+        score: '相关度',
       },
     },
   },
