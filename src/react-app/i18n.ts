@@ -198,6 +198,10 @@ const resources = {
         testFailed: 'Test failed',
         confirmDelete: 'Delete this webhook?',
       },
+      space: {
+        usage: 'Space Usage',
+        fileCount: '{{count}} files',
+      },
     },
   },
   'zh-CN': {
@@ -395,6 +399,10 @@ const resources = {
         testSuccess: '测试发送成功',
         testFailed: '测试发送失败',
         confirmDelete: '确定要删除此 Webhook 吗？',
+      },
+      space: {
+        usage: '空间使用量',
+        fileCount: '{{count}} 个文件',
       },
     },
   },
