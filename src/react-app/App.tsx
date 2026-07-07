@@ -40,6 +40,7 @@ const AdminUsersPage = lazy(() => import('@/react-app/pages/admin/AdminUsersPage
 const ExcalidrawPage = lazy(() => import('@/react-app/pages/ExcalidrawPage'))
 const AlbumsPage = lazy(() => import('@/react-app/pages/AlbumsPage'))
 const AlbumDetailPage = lazy(() => import('@/react-app/pages/AlbumDetailPage'))
+const RagPage = lazy(() => import('@/react-app/pages/RagPage'))
 
 function SettingsDialog({
   open,
@@ -173,6 +174,7 @@ function ShellLayout() {
     { label: t('nav.albums'), path: '/albums', auth: true },
     { label: t('nav.teams'), path: '/teams', auth: true },
     { label: t('nav.tags'), path: '/tags', auth: true },
+    { label: t('nav.rag'), path: '/rag', auth: true },
   ]
 
   const visibleNavItems = navItems.filter(
@@ -355,6 +357,7 @@ function AppRoutes() {
             <Route path="/tags" element={<TagsPage />} />
             <Route path="/albums" element={<AlbumsPage />} />
             <Route path="/albums/:id" element={<AlbumDetailPage />} />
+            <Route path="/rag" element={<RagPage />} />
           </Route>
         </Route>
         {/* Excalidraw - full screen without shell layout */}

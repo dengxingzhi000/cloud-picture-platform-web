@@ -18,6 +18,7 @@ const resources = {
         create: 'Create',
         delete: 'Delete',
         confirm: 'Confirm',
+        uploading: 'Uploading...',
       },
       batch: {
         selected: '{{count}} selected',
@@ -40,6 +41,7 @@ const resources = {
         teams: 'Teams',
         tags: 'Tags',
         adminReview: 'Admin Review',
+        rag: 'RAG Q&A',
       },
       app: {
         brandTitle: 'Cloud Canvas',
@@ -139,6 +141,17 @@ const resources = {
         version: 'Version',
         download: 'Download',
       },
+      rag: {
+        documents: 'Documents',
+        upload: 'Upload',
+        noDocuments: 'No documents yet. Upload PDF, Word, TXT, or Markdown files.',
+        chat: 'AI Chat',
+        welcome: 'Upload documents to start chatting with AI.',
+        placeholder: 'Type your question...',
+        send: 'Send',
+        sources: 'Sources',
+        error: 'Sorry, an error occurred. Please try again later.',
+      },
     },
   },
   'zh-CN': {
@@ -157,6 +170,7 @@ const resources = {
         create: '创建',
         delete: '删除',
         confirm: '确定',
+        uploading: '上传中...',
       },
       batch: {
         selected: '已选择 {{count}} 项',
@@ -179,6 +193,7 @@ const resources = {
         teams: '团队',
         tags: '标签',
         adminReview: '审核管理',
+        rag: '知识问答',
       },
       app: {
         brandTitle: 'Cloud Canvas',
@@ -277,6 +292,17 @@ const resources = {
         empty: '暂无版本记录',
         version: '版本',
         download: '下载',
+      },
+      rag: {
+        documents: '文档管理',
+        upload: '上传文档',
+        noDocuments: '暂无文档，请上传 PDF、Word、TXT 或 Markdown 文件',
+        chat: '智能问答',
+        welcome: '上传文档后，可以在这里进行智能问答',
+        placeholder: '输入你的问题...',
+        send: '发送',
+        sources: '参考来源',
+        error: '抱歉，处理请求时出现错误，请稍后重试。',
       },
     },
   },
