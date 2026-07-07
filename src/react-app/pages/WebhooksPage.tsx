@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { listWebhooks, createWebhook, deleteWebhook, testWebhook, type Webhook } from '@/api/webhooks'
+import { useToast } from '@/react-app/toast'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Input } from '@/react-app/ui/shadcn/input'
 import { Dialog, DialogContent, DialogHeader, DialogFooter } from '@/react-app/ui/shadcn/dialog'
@@ -9,6 +10,7 @@ const AVAILABLE_EVENTS = ['PICTURE_UPLOADED', 'PICTURE_APPROVED', 'PICTURE_REJEC
 
 export default function WebhooksPage() {
   const { t } = useTranslation()
+  const { addToast } = useToast()
   const [webhooks, setWebhooks] = useState<Webhook[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -21,7 +23,7 @@ export default function WebhooksPage() {
     try {
       const res = await listWebhooks()
       setWebhooks(res.items)
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setLoading(false)
     }
   }
@@ -37,7 +39,7 @@ export default function WebhooksPage() {
       setNewUrl('')
       setNewEvents([])
       void loadWebhooks()
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setCreating(false)
     }
   }
@@ -47,15 +49,15 @@ export default function WebhooksPage() {
     try {
       await deleteWebhook(id)
       void loadWebhooks()
-    } catch {}
+    } catch { addToast(t('common.error'), 'error') }
   }
 
   const handleTest = async (id: string) => {
     try {
       await testWebhook(id)
-      alert(t('webhooks.testSuccess'))
+      addToast(t('webhooks.testSuccess'), 'success')
     } catch {
-      alert(t('webhooks.testFailed'))
+      addToast(t('webhooks.testFailed'), 'error')
     }
   }
 

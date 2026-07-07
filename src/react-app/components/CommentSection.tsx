@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { listComments, createComment, deleteComment, resolveComment, type Comment } from '@/api/comments'
 import { useAuth } from '@/react-app/auth'
+import { useToast } from '@/react-app/toast'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Textarea } from '@/react-app/ui/shadcn/textarea'
 
@@ -10,19 +11,24 @@ type Props = { pictureId: string }
 export default function CommentSection({ pictureId }: Props) {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { addToast } = useToast()
   const [comments, setComments] = useState<Comment[]>([])
   const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
   const [newContent, setNewContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
+  const SIZE = 20
+
   const loadComments = async () => {
     setLoading(true)
     try {
-      const res = await listComments(pictureId, { page: 0, size: 50 })
+      const res = await listComments(pictureId, { page: 0, size: SIZE })
       setComments(res.items)
       setTotal(res.total)
-    } catch {} finally {
+      setPage(0)
+    } catch { addToast(t('common.error'), 'error') } finally {
       setLoading(false)
     }
   }
@@ -37,7 +43,7 @@ export default function CommentSection({ pictureId }: Props) {
       setComments((prev) => [comment, ...prev])
       setTotal((prev) => prev + 1)
       setNewContent('')
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setSubmitting(false)
     }
   }
@@ -47,14 +53,24 @@ export default function CommentSection({ pictureId }: Props) {
       await deleteComment(pictureId, commentId)
       setComments((prev) => prev.filter((c) => c.id !== commentId))
       setTotal((prev) => prev - 1)
-    } catch {}
+    } catch { addToast(t('common.error'), 'error') }
   }
 
   const handleResolve = async (commentId: string) => {
     try {
       const updated = await resolveComment(pictureId, commentId)
       setComments((prev) => prev.map((c) => (c.id === commentId ? updated : c)))
-    } catch {}
+    } catch { addToast(t('common.error'), 'error') }
+  }
+
+  const loadMore = async () => {
+    const nextPage = page + 1
+    try {
+      const res = await listComments(pictureId, { page: nextPage, size: SIZE })
+      setComments((prev) => [...prev, ...res.items])
+      setPage(nextPage)
+      setTotal(res.total)
+    } catch { addToast(t('common.error'), 'error') }
   }
 
   return (
@@ -111,6 +127,9 @@ export default function CommentSection({ pictureId }: Props) {
               <p style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{c.content}</p>
             </div>
           ))}
+          {comments.length < total && (
+            <Button variant="plain" onClick={loadMore}>{t('common.loadMore')}</Button>
+          )}
         </div>
       )}
     </div>

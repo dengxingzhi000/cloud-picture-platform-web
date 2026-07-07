@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { exportPicture, getExportTask, type ExportTask } from '@/api/export'
 import { Button } from '@/react-app/ui/shadcn/button'
@@ -11,6 +11,15 @@ export default function ExportPanel({ pictureId }: Props) {
   const [quality, setQuality] = useState(90)
   const [exporting, setExporting] = useState(false)
   const [result, setResult] = useState<ExportTask | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const mountedRef = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   const handleExport = async () => {
     setExporting(true)
@@ -18,18 +27,19 @@ export default function ExportPanel({ pictureId }: Props) {
       const task = await exportPicture(pictureId, { format, quality })
       let pollCount = 0
       const poll = async () => {
+        if (!mountedRef.current) return
         const updated = await getExportTask(task.id)
         if (updated.status === 'COMPLETED' || updated.status === 'FAILED' || pollCount > 30) {
-          setResult(updated)
-          setExporting(false)
+          if (mountedRef.current) setResult(updated)
+          if (mountedRef.current) setExporting(false)
           return
         }
         pollCount++
-        setTimeout(poll, 1000)
+        timeoutRef.current = setTimeout(poll, 1000)
       }
       await poll()
     } catch {} finally {
-      setExporting(false)
+      if (mountedRef.current) setExporting(false)
     }
   }
 

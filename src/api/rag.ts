@@ -10,27 +10,28 @@ export type RagDocument = {
   createdAt: string
 }
 
+export type RagSource = {
+  documentId: string
+  documentName: string
+  chunkIndex: number
+  content: string
+  score: number
+}
+
 export type RagQueryResult = {
   answer: string
-  sources: Array<{
-    documentId: string
-    documentName: string
-    chunkIndex: number
-    content: string
-    score: number
-  }>
+  sources: RagSource[]
 }
 
 export type RagChatResult = {
   sessionId: string
   answer: string
-  sources: Array<{
-    documentId: string
-    documentName: string
-    chunkIndex: number
-    content: string
-    score: number
-  }>
+  sources: RagSource[]
+}
+
+export async function listDocuments() {
+  const response = await api.get<ApiResponse<RagDocument[]>>('/api/rag/documents')
+  return unwrap(response.data)
 }
 
 export async function uploadDocument(file: File) {

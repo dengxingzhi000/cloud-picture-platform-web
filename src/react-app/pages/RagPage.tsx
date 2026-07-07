@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { uploadDocument, chatRag, deleteDocument, type RagDocument, type RagChatResult } from '@/api/rag'
+import { uploadDocument, chatRag, deleteDocument, listDocuments, type RagDocument, type RagChatResult } from '@/api/rag'
 import { Button } from '@/react-app/ui/shadcn/button'
-import { Input } from '@/react-app/ui/shadcn/input'
+import { Textarea } from '@/react-app/ui/shadcn/textarea'
 
 type ChatMessage = {
   role: 'user' | 'assistant'
@@ -24,6 +24,10 @@ export default function RagPage() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages])
+
+  useEffect(() => {
+    listDocuments().then(setDocuments).catch(() => {})
+  }, [])
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -115,7 +119,7 @@ export default function RagPage() {
           <div ref={chatEndRef} />
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder={t('rag.placeholder')} onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()} />
+          <Textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder={t('rag.placeholder')} rows={1} onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }} />
           <Button variant="primary" onClick={handleSend} disabled={sending || !input.trim()}>{t('rag.send')}</Button>
         </div>
       </div>

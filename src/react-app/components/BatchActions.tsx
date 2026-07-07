@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { batchDelete, batchUpdateVisibility } from '@/api/batch'
+import { useToast } from '@/react-app/toast'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Dialog, DialogContent, DialogHeader, DialogFooter } from '@/react-app/ui/shadcn/dialog'
 
@@ -12,6 +13,7 @@ type Props = {
 
 export default function BatchActions({ selectedIds, onClearSelection, onComplete }: Props) {
   const { t } = useTranslation()
+  const { addToast } = useToast()
   const [showVisibility, setShowVisibility] = useState(false)
   const [newVisibility, setNewVisibility] = useState<'PUBLIC' | 'PRIVATE' | 'TEAM'>('PRIVATE')
   const [processing, setProcessing] = useState(false)
@@ -25,7 +27,7 @@ export default function BatchActions({ selectedIds, onClearSelection, onComplete
       await batchDelete(selectedIds)
       onClearSelection()
       onComplete()
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setProcessing(false)
     }
   }
@@ -37,7 +39,7 @@ export default function BatchActions({ selectedIds, onClearSelection, onComplete
       setShowVisibility(false)
       onClearSelection()
       onComplete()
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setProcessing(false)
     }
   }

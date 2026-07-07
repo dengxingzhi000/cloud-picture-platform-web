@@ -7,6 +7,7 @@ import {
   deleteAlbum,
   type Album,
 } from '@/api/albums'
+import { useToast } from '@/react-app/toast'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Dialog, DialogContent, DialogHeader, DialogFooter } from '@/react-app/ui/shadcn/dialog'
 import { Input } from '@/react-app/ui/shadcn/input'
@@ -15,6 +16,7 @@ import { Textarea } from '@/react-app/ui/shadcn/textarea'
 export default function AlbumsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { addToast } = useToast()
   const [albums, setAlbums] = useState<Album[]>([])
   const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -28,10 +30,10 @@ export default function AlbumsPage() {
   const loadAlbums = async (pageIndex: number) => {
     setLoading(true)
     try {
-      const res = await listAlbums({ spaceId: 'current', page: pageIndex, size: SIZE })
+      const res = await listAlbums({ spaceId: '', page: pageIndex, size: SIZE })
       setAlbums(res.items)
       setPage(pageIndex)
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setLoading(false)
     }
   }
@@ -42,12 +44,12 @@ export default function AlbumsPage() {
     if (!newName.trim()) return
     setCreating(true)
     try {
-      await createAlbum({ name: newName.trim(), description: newDesc.trim() || undefined, spaceId: 'current' })
+      await createAlbum({ name: newName.trim(), description: newDesc.trim() || undefined, spaceId: '' })
       setShowCreate(false)
       setNewName('')
       setNewDesc('')
       void loadAlbums(0)
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setCreating(false)
     }
   }
@@ -57,7 +59,7 @@ export default function AlbumsPage() {
     try {
       await deleteAlbum(id)
       void loadAlbums(page)
-    } catch {}
+    } catch { addToast(t('common.error'), 'error') }
   }
 
   return (

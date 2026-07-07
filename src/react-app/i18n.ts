@@ -22,6 +22,8 @@ const resources = {
         searching: 'Searching...',
         search: 'Search',
         close: 'Close',
+        error: 'Operation failed. Please try again.',
+        loadMore: 'Load More',
       },
       batch: {
         selected: '{{count}} selected',
@@ -183,6 +185,8 @@ const resources = {
         confirmDelete: 'Delete this API key?',
         created: 'Created',
         lastUsed: 'Last used',
+        copied: 'Copied',
+        copy: 'Copy',
       },
       webhooks: {
         title: 'Webhook Management',
@@ -224,6 +228,8 @@ const resources = {
         searching: '搜索中...',
         search: '搜索',
         close: '关闭',
+        error: '操作失败，请重试',
+        loadMore: '加载更多',
       },
       batch: {
         selected: '已选择 {{count}} 项',
@@ -385,6 +391,8 @@ const resources = {
         confirmDelete: '确定要删除此密钥吗？',
         created: '创建于',
         lastUsed: '最后使用',
+        copied: '已复制',
+        copy: '复制',
       },
       webhooks: {
         title: 'Webhook 管理',

@@ -1,24 +1,30 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { listVersions, createVersion, type PictureVersion } from '@/api/versions'
+import { useToast } from '@/react-app/toast'
 import { Button } from '@/react-app/ui/shadcn/button'
 
 type Props = { pictureId: string }
 
 export default function VersionHistory({ pictureId }: Props) {
   const { t } = useTranslation()
+  const { addToast } = useToast()
   const [versions, setVersions] = useState<PictureVersion[]>([])
   const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+
+  const SIZE = 10
 
   const loadVersions = async () => {
     setLoading(true)
     try {
-      const res = await listVersions(pictureId, { page: 0, size: 20 })
+      const res = await listVersions(pictureId, { page: 0, size: SIZE })
       setVersions(res.items)
       setTotal(res.total)
-    } catch {} finally {
+      setPage(0)
+    } catch { addToast(t('common.error'), 'error') } finally {
       setLoading(false)
     }
   }
@@ -31,9 +37,19 @@ export default function VersionHistory({ pictureId }: Props) {
       const v = await createVersion(pictureId)
       setVersions((prev) => [v, ...prev])
       setTotal((prev) => prev + 1)
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setCreating(false)
     }
+  }
+
+  const loadMore = async () => {
+    const nextPage = page + 1
+    try {
+      const res = await listVersions(pictureId, { page: nextPage, size: SIZE })
+      setVersions((prev) => [...prev, ...res.items])
+      setPage(nextPage)
+      setTotal(res.total)
+    } catch { addToast(t('common.error'), 'error') }
   }
 
   return (
@@ -64,6 +80,9 @@ export default function VersionHistory({ pictureId }: Props) {
               </a>
             </div>
           ))}
+          {versions.length < total && (
+            <Button variant="plain" onClick={loadMore}>{t('common.loadMore')}</Button>
+          )}
         </div>
       )}
     </div>

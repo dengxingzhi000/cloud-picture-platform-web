@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { semanticSearch, type SemanticResult } from '@/api/semantic'
+import { useToast } from '@/react-app/toast'
 import { Input } from '@/react-app/ui/shadcn/input'
 import { Button } from '@/react-app/ui/shadcn/button'
 
 export default function SemanticSearchPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const { addToast } = useToast()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SemanticResult[]>([])
   const [loading, setLoading] = useState(false)
@@ -20,7 +21,7 @@ export default function SemanticSearchPage() {
     try {
       const res = await semanticSearch({ query: query.trim(), size: 20 })
       setResults(res.items)
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') }
       setLoading(false)
     }
   }
@@ -49,7 +50,7 @@ export default function SemanticSearchPage() {
       ) : (
         <div className="grid cols-3">
           {results.map((r) => (
-            <button key={r.id} className="card" onClick={() => navigate(`/pictures/${r.id}`)}>
+            <Link key={r.id} className="card" to={`/pictures/${r.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <img src={r.thumbnailUrl || r.url} alt={r.name} style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 8 }} />
               <div style={{ padding: '12px 0 0' }}>
                 <strong>{r.name}</strong>
@@ -58,7 +59,7 @@ export default function SemanticSearchPage() {
                   <span>{t('semantic.score')}: {(r.score * 100).toFixed(0)}%</span>
                 </div>
               </div>
-            </button>
+            </Link>
           ))}
         </div>
       )}

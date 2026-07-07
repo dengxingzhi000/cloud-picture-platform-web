@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { listApiKeys, createApiKey, deleteApiKey, type ApiKey } from '@/api/developer'
+import { useToast } from '@/react-app/toast'
 import { Button } from '@/react-app/ui/shadcn/button'
 import { Input } from '@/react-app/ui/shadcn/input'
 import { Dialog, DialogContent, DialogHeader, DialogFooter } from '@/react-app/ui/shadcn/dialog'
 
 export default function DeveloperPage() {
   const { t } = useTranslation()
+  const { addToast } = useToast()
   const [keys, setKeys] = useState<ApiKey[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -19,7 +21,7 @@ export default function DeveloperPage() {
     try {
       const res = await listApiKeys()
       setKeys(res.items)
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setLoading(false)
     }
   }
@@ -34,7 +36,7 @@ export default function DeveloperPage() {
       setCreatedKey(result.fullKey)
       setNewName('')
       void loadKeys()
-    } catch {} finally {
+    } catch { addToast(t('common.error'), 'error') } finally {
       setCreating(false)
     }
   }
@@ -44,7 +46,7 @@ export default function DeveloperPage() {
     try {
       await deleteApiKey(keyId)
       void loadKeys()
-    } catch {}
+    } catch { addToast(t('common.error'), 'error') }
   }
 
   return (
@@ -85,7 +87,15 @@ export default function DeveloperPage() {
           {createdKey ? (
             <div>
               <p style={{ marginBottom: 8 }}>{t('developer.copyKey')}</p>
-              <Input value={createdKey} readOnly />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <Input value={createdKey} readOnly style={{ flex: 1 }} />
+                <Button variant="plain" size="sm" onClick={() => {
+                  navigator.clipboard.writeText(createdKey)
+                  addToast(t('developer.copied'), 'success')
+                }}>
+                  {t('developer.copy')}
+                </Button>
+              </div>
               <p style={{ fontSize: 12, opacity: 0.5, marginTop: 8 }}>{t('developer.keyWarning')}</p>
             </div>
           ) : (
