@@ -17,6 +17,20 @@ const resources = {
         creating: 'Creating...',
         create: 'Create',
         delete: 'Delete',
+        confirm: 'Confirm',
+      },
+      batch: {
+        selected: '{{count}} selected',
+        changeVisibility: 'Change Visibility',
+        delete: 'Batch Delete',
+        clearSelection: 'Clear Selection',
+        setVisibility: 'Set Visibility',
+        confirmDelete: 'Delete {{count}} pictures?',
+      },
+      visibility: {
+        PUBLIC: 'Public',
+        PRIVATE: 'Private',
+        TEAM: 'Team',
       },
       nav: {
         gallery: 'Public Gallery',
@@ -142,6 +156,20 @@ const resources = {
         creating: '创建中...',
         create: '创建',
         delete: '删除',
+        confirm: '确定',
+      },
+      batch: {
+        selected: '已选择 {{count}} 项',
+        changeVisibility: '修改可见性',
+        delete: '批量删除',
+        clearSelection: '取消选择',
+        setVisibility: '设置可见性',
+        confirmDelete: '确定删除 {{count}} 张图片？',
+      },
+      visibility: {
+        PUBLIC: '公开',
+        PRIVATE: '私有',
+        TEAM: '团队',
       },
       nav: {
         gallery: '公共图库',
